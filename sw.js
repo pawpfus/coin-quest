@@ -1,6 +1,8 @@
-/* COIN QUEST service worker — offline app shell cache.
-   Bump CACHE when you change any shell asset to force an update. */
-const CACHE = 'coinquest-v5';
+/* COIN QUEST service worker — network-first with offline fallback.
+   Network-first means the latest deployed version always wins when online,
+   while the cached app shell keeps it working offline.
+   Bump CACHE when you change any shell asset. */
+const CACHE = 'coinquest-v6';
 const ASSETS = [
   './',
   './index.html',
@@ -31,18 +33,18 @@ self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
   e.respondWith((async () => {
-    const cached = await caches.match(req);
-    if (cached) return cached;
+    // network-first: always try the live version when online
     try {
       const res = await fetch(req);
-      // runtime-cache same-origin successful responses
       if (res.ok && new URL(req.url).origin === self.location.origin) {
         const c = await caches.open(CACHE);
         c.put(req, res.clone());
       }
       return res;
     } catch (err) {
-      // offline: fall back to the app shell for navigations
+      // offline: serve from cache, falling back to the app shell for navigations
+      const cached = await caches.match(req);
+      if (cached) return cached;
       if (req.mode === 'navigate') {
         const shell = await caches.match('./index.html');
         if (shell) return shell;
