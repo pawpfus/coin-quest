@@ -482,8 +482,8 @@ select { -webkit-appearance: none; appearance: none; cursor: pointer; }
 
 /* =========================== FOOTER =========================== */
 .foot {
-  display: flex; justify-content: space-between; align-items: center;
-  flex-wrap: wrap; gap: 14px; margin-top: 8px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 16px; margin-top: 8px;
 }
 .danger-btn {
   font-family: inherit; font-size: 8px;
@@ -530,7 +530,13 @@ select { -webkit-appearance: none; appearance: none; cursor: pointer; }
 .toast.show { transform: translate(-50%, 0); }
 
 /* =========================== EXPORT BUTTON =========================== */
-.foot-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.foot-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  width: 100%;
+}
+.foot-actions > button { width: 100%; text-align: center; }
 .export-btn {
   font-family: inherit; font-size: 8px;
   padding: 12px 14px; color: #06250f;
