@@ -511,6 +511,7 @@ select { -webkit-appearance: none; appearance: none; cursor: pointer; }
 @media (max-width: 720px) {
   .stats { grid-template-columns: 1fr; }
   .grid { grid-template-columns: 1fr; }
+  .quest-row { grid-template-columns: 1fr; }
   .logo-octo { display: none; }
   .cat-row { grid-template-columns: 86px 1fr 60px; }
 }
