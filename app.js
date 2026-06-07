@@ -678,9 +678,10 @@ function buildReport() {
 
 function exportPDF() {
   sfx.click();
+  // Build synchronously and call print() directly inside the tap handler —
+  // mobile browsers block print() if it is deferred out of the user gesture.
   els.printReport.innerHTML = buildReport();
-  showToast('⎙ OPENING PRINT… CHOOSE "SAVE AS PDF"');
-  setTimeout(() => window.print(), 250);
+  window.print();
 }
 
 function resetAll() {

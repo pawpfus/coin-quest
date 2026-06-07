@@ -523,8 +523,8 @@ select { -webkit-appearance: none; appearance: none; cursor: pointer; }
 
 @media print {
   .crt, .screen, .toast { display: none !important; }
-  body { background: #fff !important; padding: 0 !important; }
-  .print-report { display: block !important; }
+  html, body { background: #fff !important; padding: 0 !important; margin: 0 !important; width: auto !important; height: auto !important; overflow: visible !important; }
+  .print-report { display: block !important; width: 100% !important; }
   @page { margin: 14mm; }
 }
 
