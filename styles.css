@@ -539,6 +539,15 @@ select { -webkit-appearance: none; appearance: none; cursor: pointer; }
   box-shadow: inset 2px 2px 0 rgba(255,255,255,.5), inset -2px -2px 0 var(--gold-dk);
 }
 .export-btn:hover { filter: brightness(1.08); }
+.io-btn {
+  font-family: inherit; font-size: 8px;
+  padding: 12px 14px; color: #04212f;
+  background: var(--blue); border: 3px solid var(--shadow);
+  cursor: pointer;
+  box-shadow: inset 2px 2px 0 rgba(255,255,255,.45), inset -2px -2px 0 rgba(0,0,0,.3);
+}
+.io-btn:hover { filter: brightness(1.08); }
+.io-btn:active { transform: translateY(2px); }
 
 /* =========================== PRINT / PDF REPORT =========================== */
 .print-report { display: none; }

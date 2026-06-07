@@ -1,0 +1,9 @@
+{
+  "transactions": [],
+  "soundOn": true,
+  "budget": 0,
+  "goal": null,
+  "budgetBreached": false,
+  "goalCelebrated": false,
+  "catBudgets": {}
+}

@@ -38,6 +38,9 @@ A `🔥 X MO` counter in the HUD counts consecutive completed months you stayed 
 ### 📊 World Map — 6-Month History
 A pixel bar chart of the last six months, with paired green (earn) / red (spend) columns and the current month highlighted.
 
+### 💾 Backup & Restore
+Export all your data to a `.json` file you can save anywhere, and import it back later — so you can move data between devices or keep it safe before clearing your browser. (Your data lives only in this browser's `localStorage`; clearing site data deletes it, so back up first.)
+
 ### 📄 Export to PDF
 One click generates a clean, printable financial report — summary, budget status, savings quest, category breakdown, and a full transaction table — then opens your browser's print dialog so you can **Save as PDF**. Works offline and on mobile; no libraries.
 

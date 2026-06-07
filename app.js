@@ -58,6 +58,7 @@ const els = {
   reset: $('resetBtn'), toast: $('toast'),
   exportBtn: $('exportBtn'), printReport: $('printReport'),
   updateBar: $('updateBar'), updateBtn: $('updateBtn'),
+  backupBtn: $('backupBtn'), restoreBtn: $('restoreBtn'), restoreInput: $('restoreInput'),
   // boss / budget
   bossPanel: $('bossPanel'), bossTitle: $('bossTitle'), bossSprite: $('bossSprite'),
   bossName: $('bossName'), hpFill: $('hpFill'), hpText: $('hpText'),
@@ -677,6 +678,52 @@ function buildReport() {
   return html;
 }
 
+/* ---- backup (export JSON) & restore (import JSON) ---- */
+function exportBackup() {
+  sfx.click();
+  const json = JSON.stringify(state, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'coin-quest-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  showToast('💾 BACKUP SAVED — KEEP IT SAFE!');
+}
+
+function importBackup(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    let data;
+    try {
+      data = JSON.parse(reader.result);
+    } catch (e) { sfx.error(); showToast('⚠ INVALID BACKUP FILE'); return; }
+    if (!data || !Array.isArray(data.transactions)) {
+      sfx.error(); showToast('⚠ NOT A COIN QUEST BACKUP'); return;
+    }
+    if (!confirm('RESTORE THIS BACKUP?\nIt will REPLACE your current data.')) return;
+    state.transactions = data.transactions;
+    state.budget = Number(data.budget) || 0;
+    state.goal = (data.goal && data.goal.target)
+      ? { name: String(data.goal.name || 'SAVINGS QUEST'), target: Number(data.goal.target) }
+      : null;
+    state.catBudgets = (data.catBudgets && typeof data.catBudgets === 'object') ? data.catBudgets : {};
+    state.soundOn = data.soundOn !== false;
+    state.budgetBreached = !!data.budgetBreached;
+    state.goalCelebrated = !!data.goalCelebrated;
+    save();
+    sfx.coin();
+    showToast('📂 BACKUP RESTORED! ' + state.transactions.length + ' ENTRIES');
+    els.mute.textContent = '♪ SOUND: ' + (state.soundOn ? 'ON' : 'OFF');
+    renderAll();
+  };
+  reader.onerror = () => { sfx.error(); showToast('⚠ COULD NOT READ FILE'); };
+  reader.readAsText(file);
+}
+
 function exportPDF() {
   sfx.click();
   // Build synchronously and call print() directly inside the tap handler —
@@ -723,6 +770,13 @@ els.btnExpense.addEventListener('click', () => setType('expense'));
 els.btnIncome.addEventListener('click', () => setType('income'));
 els.reset.addEventListener('click', resetAll);
 els.exportBtn.addEventListener('click', exportPDF);
+els.backupBtn.addEventListener('click', exportBackup);
+els.restoreBtn.addEventListener('click', () => els.restoreInput.click());
+els.restoreInput.addEventListener('change', (e) => {
+  const f = e.target.files[0];
+  if (f) importBackup(f);
+  e.target.value = ''; // allow re-importing the same file
+});
 
 els.editBudgetBtn.addEventListener('click', toggleBudgetEditor);
 els.saveBudgetBtn.addEventListener('click', saveBudget);
