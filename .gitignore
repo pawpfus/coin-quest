@@ -4,6 +4,9 @@
 # build output
 dist/
 
+# exported backups (user data — never commit)
+coin-quest-backup-*.json
+
 # OS cruft
 .DS_Store
 Thumbs.db
