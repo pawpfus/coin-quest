@@ -1,0 +1,15 @@
+# preview/dev tooling (contains machine-specific absolute paths)
+.claude/
+
+# build output
+dist/
+
+# OS cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# editor
+.vscode/
+.idea/
+*.swp
