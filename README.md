@@ -44,6 +44,9 @@ Export all your data to a `.json` file you can save anywhere, and import it back
 ### 📄 Export to PDF
 One click generates a clean, printable financial report — summary, budget status, savings quest, category breakdown, and a full transaction table — then opens your browser's print dialog so you can **Save as PDF**. Works offline and on mobile; no libraries.
 
+### 👾 Roaming buddies
+Little pixel characters drift and bounce freely around the screen for extra retro charm. They never block clicks, and they respect your "reduced motion" setting.
+
 ### 🎵 Chiptune sound effects
 Coin pickups, spend blips, error buzzes, boss roars, and victory fanfares — all generated live with the Web Audio API (no audio files). Toggle with the SOUND button.
 

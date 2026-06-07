@@ -877,3 +877,52 @@ if ('serviceWorker' in navigator) {
     } catch (e) { /* unsupported / file:// */ }
   });
 }
+
+/* ============================================================
+   ROAMING BUDDIES — little pixel characters that drift around
+============================================================ */
+(function spawnFloaters() {
+  // respect users who prefer no motion
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const CHARS = ['🐙', '👾', '🪙', '⭐', '🍄', '👻', '🎮'];
+  const COUNT = 3;
+
+  for (let i = 0; i < COUNT; i++) {
+    const el = document.createElement('div');
+    el.className = 'floater';
+    const inner = document.createElement('span');
+    inner.className = 'fl-inner';
+    inner.textContent = CHARS[Math.floor(Math.random() * CHARS.length)];
+    el.appendChild(inner);
+    document.body.appendChild(el);
+
+    const size = 22 + Math.random() * 16;
+    el.style.fontSize = size + 'px';
+    inner.style.animationDelay = (Math.random() * 1.5) + 's';
+
+    let x = Math.random() * Math.max(1, window.innerWidth - size);
+    let y = Math.random() * Math.max(1, window.innerHeight - size);
+    const speed = 0.3 + Math.random() * 0.4;            // px per frame (gentle)
+    const ang = Math.random() * Math.PI * 2;
+    let vx = Math.cos(ang) * speed;
+    let vy = Math.sin(ang) * speed;
+
+    (function step() {
+      // wander a little so movement feels free, then renormalise to keep speed steady
+      vx += (Math.random() - 0.5) * 0.04;
+      vy += (Math.random() - 0.5) * 0.04;
+      const sp = Math.hypot(vx, vy) || 0.001;
+      vx = (vx / sp) * speed;
+      vy = (vy / sp) * speed;
+
+      x += vx; y += vy;
+      const m = size + 6;
+      if (x < 0) { x = 0; vx = Math.abs(vx); } else if (x > window.innerWidth - m) { x = window.innerWidth - m; vx = -Math.abs(vx); }
+      if (y < 0) { y = 0; vy = Math.abs(vy); } else if (y > window.innerHeight - m) { y = window.innerHeight - m; vy = -Math.abs(vy); }
+
+      el.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)' + (vx < 0 ? ' scaleX(-1)' : '');
+      requestAnimationFrame(step);
+    })();
+  }
+})();

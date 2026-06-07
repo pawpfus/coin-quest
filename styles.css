@@ -517,6 +517,15 @@ select { -webkit-appearance: none; appearance: none; cursor: pointer; }
 }
 .update-bar button:active { transform: translateY(2px); }
 
+/* =========================== ROAMING BUDDIES =========================== */
+.floater {
+  position: fixed; top: 0; left: 0; z-index: 500;
+  pointer-events: none; opacity: .78; will-change: transform;
+  filter: drop-shadow(2px 2px 0 var(--shadow));
+}
+.fl-inner { display: block; animation: flBob 1.5s ease-in-out infinite; }
+@keyframes flBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
 /* =========================== TOAST =========================== */
 .toast {
   position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 120px);
