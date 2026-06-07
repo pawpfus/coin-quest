@@ -43,6 +43,7 @@ let state = {
 };
 let currentType = 'expense';
 let currentFilter = 'all';
+let scatterBuddies = () => {}; // assigned by the roaming-buddies system below
 
 /* ---------------- elements ---------------- */
 const $ = (id) => document.getElementById(id);
@@ -497,6 +498,7 @@ function addTx(e) {
 
   currentType === 'income' ? sfx.coin() : sfx.spend();
   renderAll(prevLevel);
+  scatterBuddies(); // the pixel buddies bolt away in surprise
 
   els.form.reset();
   els.desc.focus();
@@ -887,6 +889,7 @@ if ('serviceWorker' in navigator) {
 
   const CHARS = ['🐙', '👾', '🪙', '⭐', '🍄', '👻', '🎮'];
   const COUNT = 3;
+  const buddies = [];
 
   for (let i = 0; i < COUNT; i++) {
     const el = document.createElement('div');
@@ -901,28 +904,52 @@ if ('serviceWorker' in navigator) {
     el.style.fontSize = size + 'px';
     inner.style.animationDelay = (Math.random() * 1.5) + 's';
 
-    let x = Math.random() * Math.max(1, window.innerWidth - size);
-    let y = Math.random() * Math.max(1, window.innerHeight - size);
-    const speed = 0.3 + Math.random() * 0.4;            // px per frame (gentle)
     const ang = Math.random() * Math.PI * 2;
-    let vx = Math.cos(ang) * speed;
-    let vy = Math.sin(ang) * speed;
-
-    (function step() {
-      // wander a little so movement feels free, then renormalise to keep speed steady
-      vx += (Math.random() - 0.5) * 0.04;
-      vy += (Math.random() - 0.5) * 0.04;
-      const sp = Math.hypot(vx, vy) || 0.001;
-      vx = (vx / sp) * speed;
-      vy = (vy / sp) * speed;
-
-      x += vx; y += vy;
-      const m = size + 6;
-      if (x < 0) { x = 0; vx = Math.abs(vx); } else if (x > window.innerWidth - m) { x = window.innerWidth - m; vx = -Math.abs(vx); }
-      if (y < 0) { y = 0; vy = Math.abs(vy); } else if (y > window.innerHeight - m) { y = window.innerHeight - m; vy = -Math.abs(vy); }
-
-      el.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)' + (vx < 0 ? ' scaleX(-1)' : '');
-      requestAnimationFrame(step);
-    })();
+    const base = 0.3 + Math.random() * 0.4;             // gentle drift speed
+    const b = {
+      el, size,
+      x: Math.random() * Math.max(1, window.innerWidth - size),
+      y: Math.random() * Math.max(1, window.innerHeight - size),
+      vx: Math.cos(ang) * base, vy: Math.sin(ang) * base,
+      base, boostUntil: 0, boostSpeed: base,
+    };
+    buddies.push(b);
   }
+
+  // burst: fling every buddy in a fresh random direction at high speed
+  scatterBuddies = () => {
+    const now = performance.now();
+    buddies.forEach((b) => {
+      const a = Math.random() * Math.PI * 2;
+      b.boostSpeed = 6 + Math.random() * 4;
+      b.vx = Math.cos(a) * b.boostSpeed;
+      b.vy = Math.sin(a) * b.boostSpeed;
+      b.boostUntil = now + 850;
+    });
+  };
+
+  (function step(now) {
+    buddies.forEach((b) => {
+      const boosting = now < b.boostUntil;
+      const target = boosting ? b.boostSpeed : b.base;
+      if (!boosting) {            // gentle wander only when calm
+        b.vx += (Math.random() - 0.5) * 0.04;
+        b.vy += (Math.random() - 0.5) * 0.04;
+      }
+      const sp = Math.hypot(b.vx, b.vy) || 0.001;
+      b.vx = (b.vx / sp) * target;
+      b.vy = (b.vy / sp) * target;
+
+      b.x += b.vx; b.y += b.vy;
+      const m = b.size + 6;
+      if (b.x < 0) { b.x = 0; b.vx = Math.abs(b.vx); } else if (b.x > window.innerWidth - m) { b.x = window.innerWidth - m; b.vx = -Math.abs(b.vx); }
+      if (b.y < 0) { b.y = 0; b.vy = Math.abs(b.vy); } else if (b.y > window.innerHeight - m) { b.y = window.innerHeight - m; b.vy = -Math.abs(b.vy); }
+
+      // ease the boost speed back down toward base so they settle smoothly
+      if (!boosting && b.boostSpeed > b.base) b.boostSpeed = b.base;
+
+      b.el.style.transform = 'translate(' + b.x.toFixed(1) + 'px,' + b.y.toFixed(1) + 'px)' + (b.vx < 0 ? ' scaleX(-1)' : '');
+    });
+    requestAnimationFrame(step);
+  })(performance.now());
 })();
