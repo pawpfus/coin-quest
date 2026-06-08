@@ -42,6 +42,7 @@ let state = {
   catBudgets: {},       // { categoryId: monthlyLimit } — mini-bosses
   questsDone: [],       // ids of completed side quests
   theme: 'default',     // unlockable skin
+  themesSeen: [],       // skins already announced as unlocked
   lastChest: null,      // YYYY-MM-DD of last daily-chest open
   chestStreak: 0,       // consecutive days opening the chest
   rainbow: false,       // konami-code rainbow mode
@@ -653,6 +654,12 @@ function renderThemes() {
   els.themeGrid.innerHTML = '';
   THEMES.forEach((t) => {
     const unlocked = themeUnlocked(t);
+    // celebrate the moment a skin unlocks (but not silently on first load)
+    if (unlocked && !state.themesSeen.includes(t.id)) {
+      state.themesSeen.push(t.id);
+      save();
+      if (appReady) { coinRain(32); sfx.victory(); showToast('🎨 NEW SKIN UNLOCKED: ' + t.name + '!'); }
+    }
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'theme-btn' + (state.theme === t.id ? ' active' : '') + (unlocked ? '' : ' locked');
@@ -968,6 +975,7 @@ function importBackup(file) {
     state.catBudgets = (data.catBudgets && typeof data.catBudgets === 'object') ? data.catBudgets : {};
     state.questsDone = Array.isArray(data.questsDone) ? data.questsDone : [];
     state.theme = data.theme || 'default';
+    state.themesSeen = Array.isArray(data.themesSeen) ? data.themesSeen : [];
     state.lastChest = data.lastChest || null;
     state.chestStreak = Number(data.chestStreak) || 0;
     state.rainbow = !!data.rainbow;
