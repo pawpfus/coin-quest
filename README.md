@@ -54,7 +54,7 @@ A retro advisor that reads **your own tracked data** and gives personalised tips
 Open a treasure chest once per day for a coin-shower animation and a random tip, building a daily-login streak.
 
 ### 🎨 Unlockable skins
-Retro theme palettes — Classic, Game Boy, SNES, Arcade — that unlock as you level up and re-skin the whole app.
+Retro theme palettes that re-skin the whole app — Classic, Game Boy, SNES, and Arcade unlock as you level up, and a secret **Midas** gold skin unlocks only after you complete every Side Quest.
 
 ### 🌈 Secret cheat
 Enter the Konami code (↑↑↓↓←→←→ B A) on a keyboard, or tap the title 8 times on mobile, to toggle rainbow mode with a coin rain.

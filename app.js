@@ -630,32 +630,40 @@ function openChest() {
 }
 
 /* ---------------- UNLOCKABLE THEMES ---------------- */
+// Each theme unlocks either by level (lv) or by a milestone (req + reqLabel).
 const THEMES = [
   { id: 'default', name: 'CLASSIC',  lv: 1, sw: ['#0b0b1f', '#ffd23f'] },
   { id: 'gameboy', name: 'GAME BOY', lv: 2, sw: ['#0f380f', '#9bbc0f'] },
   { id: 'snes',    name: 'SNES',     lv: 4, sw: ['#211a3a', '#b6a6ff'] },
   { id: 'arcade',  name: 'ARCADE',   lv: 6, sw: ['#05050a', '#ff2fd0'] },
+  { id: 'midas',   name: 'MIDAS',    req: () => state.questsDone.length >= CHALLENGES.length, reqLabel: 'ALL QUESTS', sw: ['#120d02', '#ffd23f'] },
 ];
+function themeUnlocked(t) {
+  if (t.req) return t.req();
+  return levelFor(totals().income) >= (t.lv || 1);
+}
+function themeReq(t) {
+  return t.req ? t.reqLabel : ('LV.' + t.lv);
+}
 function applyTheme(id) {
   if (id && id !== 'default') document.body.dataset.theme = id;
   else delete document.body.dataset.theme;
 }
 function renderThemes() {
-  const level = levelFor(totals().income);
   els.themeGrid.innerHTML = '';
   THEMES.forEach((t) => {
-    const unlocked = level >= t.lv;
+    const unlocked = themeUnlocked(t);
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'theme-btn' + (state.theme === t.id ? ' active' : '') + (unlocked ? '' : ' locked');
-    btn.innerHTML = `<span class="sw"><i style="background:${t.sw[0]}"></i><i style="background:${t.sw[1]}"></i><i style="background:${t.sw[1]}"></i><i style="background:${t.sw[0]}"></i></span>${t.name}<span class="lock">${unlocked ? (state.theme === t.id ? '✓' : '') : '🔒 LV.' + t.lv}</span>`;
+    btn.innerHTML = `<span class="sw"><i style="background:${t.sw[0]}"></i><i style="background:${t.sw[1]}"></i><i style="background:${t.sw[1]}"></i><i style="background:${t.sw[0]}"></i></span>${t.name}<span class="lock">${unlocked ? (state.theme === t.id ? '✓' : '') : '🔒 ' + themeReq(t)}</span>`;
     if (unlocked) {
       btn.addEventListener('click', () => {
         state.theme = t.id; save(); applyTheme(t.id); sfx.click(); renderThemes();
         showToast('🎨 SKIN: ' + t.name);
       });
     } else {
-      btn.addEventListener('click', () => { sfx.error(); showToast('🔒 REACH LV.' + t.lv + ' TO UNLOCK ' + t.name); });
+      btn.addEventListener('click', () => { sfx.error(); showToast('🔒 UNLOCK ' + t.name + ': ' + themeReq(t)); });
     }
     els.themeGrid.appendChild(btn);
   });

@@ -752,6 +752,15 @@ body[data-theme="arcade"] {
   --blue: #2ff0ff; --purple: #c54dff; --pink: #ff2fd0;
   --shadow: #000006;
 }
+body[data-theme="midas"] {
+  --bg: #120d02; --bg-2: #1e1606; --panel: #2a2008; --panel-lt: #3d300d;
+  --ink: #ffe9a8; --ink-dim: #b89a4a;
+  --gold: #ffd23f; --gold-dk: #b8860b;
+  --green: #d4af37; --green-dk: #8a6d10;
+  --red: #e07b39; --red-dk: #9a4e16;
+  --blue: #e8c45a; --purple: #caa83e; --pink: #ffe08a;
+  --shadow: #0a0700;
+}
 
 /* =========================== RESPONSIVE =========================== */
 @media (max-width: 720px) {
