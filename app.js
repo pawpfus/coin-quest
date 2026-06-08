@@ -633,9 +633,9 @@ function openChest() {
 // Each theme unlocks either by level (lv) or by a milestone (req + reqLabel).
 const THEMES = [
   { id: 'default', name: 'CLASSIC',  lv: 1, sw: ['#0b0b1f', '#ffd23f'] },
-  { id: 'gameboy', name: 'GAME BOY', lv: 2, sw: ['#0f380f', '#9bbc0f'] },
-  { id: 'snes',    name: 'SNES',     lv: 4, sw: ['#211a3a', '#b6a6ff'] },
-  { id: 'arcade',  name: 'ARCADE',   lv: 6, sw: ['#05050a', '#ff2fd0'] },
+  { id: 'gameboy', name: 'GAME BOY', req: () => totals().balance >= 50000000,  reqLabel: 'BAL $50M',  sw: ['#0f380f', '#9bbc0f'] },
+  { id: 'snes',    name: 'SNES',     req: () => totals().balance >= 75000000,  reqLabel: 'BAL $75M',  sw: ['#211a3a', '#b6a6ff'] },
+  { id: 'arcade',  name: 'ARCADE',   req: () => totals().balance >= 100000000, reqLabel: 'BAL $100M', sw: ['#05050a', '#ff2fd0'] },
   { id: 'midas',   name: 'MIDAS',    req: () => state.questsDone.length >= CHALLENGES.length, reqLabel: 'ALL QUESTS', sw: ['#120d02', '#ffd23f'] },
 ];
 function themeUnlocked(t) {
