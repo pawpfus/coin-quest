@@ -76,6 +76,9 @@ const els = {
   catBudgetSelect: $('catBudgetSelect'), catBudgetInput: $('catBudgetInput'), catBudgetSave: $('catBudgetSave'),
   // world map chart + streak
   chart: $('chart'), monthStreak: $('monthStreak'),
+  // oracle + market
+  oracleText: $('oracleText'), oracleNext: $('oracleNext'),
+  marketList: $('marketList'), marketStatus: $('marketStatus'), marketRefresh: $('marketRefresh'),
 };
 
 /* ============================================================
@@ -443,6 +446,78 @@ function renderChart() {
   });
 }
 
+/* ---------------- THE ORACLE (educational tips from your data) ---------------- */
+const EDU_TIPS = [
+  '💡 Gold is a classic hedge against inflation and market crashes — many investors keep 5–10% of their portfolio in it.',
+  '💡 Stocks have historically grown over the long run. "Time in the market" usually beats "timing the market".',
+  '💡 Dollar-cost averaging — investing a fixed amount on a regular schedule — smooths out the market\'s ups and downs.',
+  '💡 Diversify: don\'t keep all your gold in one chest. Spread across stocks, bonds, gold, and cash.',
+  '💡 Build a 3–6 month emergency fund BEFORE putting money into riskier assets like stocks.',
+  '💡 Pay off high-interest debt first — clearing a 20% card is a guaranteed 20% "return".',
+  '💡 Index funds let you own a slice of hundreds of companies at once, with low fees — popular for beginners.',
+  '💡 Only invest money you won\'t need for 5+ years in stocks; keep short-term savings in cash or gold.',
+  '💡 Gold pays no dividends or interest — it\'s a store of value, not an income source. Balance it with assets that grow.',
+];
+
+function distinctMonths() {
+  const set = new Set();
+  state.transactions.forEach((t) => { const d = new Date(t.id); set.add(d.getFullYear() * 12 + d.getMonth()); });
+  return Math.max(1, set.size);
+}
+
+function oracleTips() {
+  const { income, expense, balance } = totals();
+  const tips = [];
+
+  if (state.transactions.length === 0) {
+    tips.push('🔮 Add your income and expenses, and I\'ll reveal personalised money insights here.');
+  }
+
+  if (income > 0) {
+    const rate = Math.round(((income - expense) / income) * 100);
+    if (rate < 0) tips.push('⚠ You\'re spending more than you earn. Trim expenses before thinking about investing.');
+    else if (rate < 10) tips.push('You\'re saving ' + rate + '% of your income. Aim for 20%+ to build wealth faster.');
+    else if (rate < 20) tips.push('Solid ' + rate + '% savings rate! Push toward 20% and invest the surplus.');
+    else tips.push('🔥 Great ' + rate + '% savings rate! Consider investing the surplus (index funds, gold) for long-term growth.');
+  }
+
+  // top spending category
+  const spend = {};
+  state.transactions.forEach((t) => { if (t.type === 'expense') spend[t.category] = (spend[t.category] || 0) + t.amount; });
+  const top = Object.entries(spend).sort((a, b) => b[1] - a[1])[0];
+  if (top) tips.push('Your biggest spend is ' + catInfo('expense', top[0]).name + ' (' + fmt(top[1]) + '). Small cuts there free up cash to invest.');
+
+  // emergency fund coverage
+  const avgMonthly = expense / distinctMonths();
+  if (avgMonthly > 0) {
+    const months = balance / avgMonthly;
+    if (balance <= 0) tips.push('You have no cash cushion yet. Aim for a 3–6 month emergency fund before investing.');
+    else if (months < 3) tips.push('Your savings cover ~' + months.toFixed(1) + ' months of spending. Build it to 3–6 months for safety.');
+    else tips.push('💪 Your savings cover ~' + Math.floor(months) + ' months of spending — a healthy emergency fund. Surplus could go into gold or stocks.');
+  }
+
+  // budget adherence
+  if (state.budget) {
+    const remaining = state.budget - monthSpend();
+    if (remaining < 0) tips.push('You\'re over budget this month by ' + fmt(Math.abs(remaining)) + '. Rein it in before investing more.');
+  }
+
+  // goal nudge
+  if (state.goal) {
+    const saved = Math.max(0, balance);
+    if (saved < state.goal.target) tips.push('Quest "' + state.goal.name + '": ' + fmt(state.goal.target - saved) + ' to go. Automate a weekly transfer to get there faster.');
+  }
+
+  return tips.concat(EDU_TIPS);
+}
+
+let oracleIdx = 0;
+function renderOracle() {
+  const list = oracleTips();
+  if (oracleIdx >= list.length) oracleIdx = 0;
+  els.oracleText.textContent = list[oracleIdx] || '';
+}
+
 function renderAll(prevLevel) {
   renderStats(prevLevel);
   renderList();
@@ -452,6 +527,7 @@ function renderAll(prevLevel) {
   renderMiniBosses();
   renderStreak();
   renderChart();
+  renderOracle();
 }
 
 /* ============================================================
@@ -726,6 +802,100 @@ function importBackup(file) {
   reader.readAsText(file);
 }
 
+/* ---- MARKET WATCH (live gold + stock prices) ---- */
+const fmtUSD = (n) => '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 });
+
+// fetch JSON with a hard timeout so a slow/dead endpoint can't hang the panel
+async function fetchJSON(url, ms = 8000) {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), ms);
+  try {
+    const r = await fetch(url, { signal: ctrl.signal });
+    return await r.json();
+  } finally { clearTimeout(t); }
+}
+
+async function fetchGold() {
+  const j = await fetchJSON('https://api.coingecko.com/api/v3/simple/price?ids=pax-gold&vs_currencies=usd&include_24hr_change=true');
+  const d = j['pax-gold'];
+  return { price: d.usd, chg: d.usd_24h_change };
+}
+async function fetchYahoo(sym) {
+  const url = 'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(sym) + '?range=1d&interval=1d';
+  const proxies = [
+    'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
+    'https://corsproxy.io/?url=' + encodeURIComponent(url),
+  ];
+  let lastErr;
+  for (const p of proxies) {
+    try {
+      const j = await fetchJSON(p, 8000);
+      const m = j.chart.result[0].meta;
+      const price = m.regularMarketPrice;
+      const prev = m.chartPreviousClose != null ? m.chartPreviousClose : m.previousClose;
+      if (isFinite(price) && isFinite(prev)) return { price, chg: ((price - prev) / prev) * 100 };
+    } catch (e) { lastErr = e; }
+  }
+  throw lastErr || new Error('no data');
+}
+
+const MARKET = [
+  { id: 'gold', name: 'GOLD /oz', ico: '🥇', get: fetchGold },
+  { id: 'spx',  name: 'S&P 500',  ico: '📊', get: () => fetchYahoo('^GSPC') },
+  { id: 'aapl', name: 'APPLE',    ico: '🍎', get: () => fetchYahoo('AAPL') },
+  { id: 'msft', name: 'MICROSOFT',ico: '🪟', get: () => fetchYahoo('MSFT') },
+];
+
+function setMarketRow(a, v) {
+  const row = document.getElementById('mk-' + a.id);
+  if (!row) return false;
+  const priceEl = row.querySelector('.market-price');
+  const chgEl = row.querySelector('.market-chg');
+  if (v && isFinite(v.price)) {
+    priceEl.textContent = fmtUSD(v.price);
+    const dir = v.chg > 0.01 ? 'up' : (v.chg < -0.01 ? 'down' : 'flat');
+    chgEl.className = 'market-chg ' + dir;
+    chgEl.textContent = (v.chg >= 0 ? '+' : '') + (isFinite(v.chg) ? v.chg.toFixed(2) : '0.00') + '%';
+    return true;
+  }
+  row.classList.add('err');
+  priceEl.textContent = 'N/A';
+  chgEl.className = 'market-chg flat';
+  chgEl.textContent = '—';
+  return false;
+}
+
+let marketLoading = false;
+async function loadMarket() {
+  if (marketLoading) return;
+  marketLoading = true;
+  els.marketStatus.textContent = 'LOADING LIVE PRICES…';
+  els.marketList.innerHTML = MARKET.map((a) =>
+    `<div class="market-row" id="mk-${a.id}"><span class="market-name"><span class="market-ico">${a.ico}</span>${a.name}</span><span class="market-price">…</span><span class="market-chg flat">—</span></div>`
+  ).join('');
+
+  let ok = 0;
+  const gold = MARKET.find((m) => m.id === 'gold');
+  const stocks = MARKET.filter((m) => m.id !== 'gold');
+
+  await Promise.all([
+    // gold is reliable and fast — load it in parallel
+    (async () => { try { if (setMarketRow(gold, await gold.get())) ok++; } catch (e) { setMarketRow(gold, null); } })(),
+    // stocks share one flaky proxy — load them sequentially to avoid throttling
+    (async () => {
+      for (const a of stocks) {
+        try { if (setMarketRow(a, await a.get())) ok++; } catch (e) { setMarketRow(a, null); }
+      }
+    })(),
+  ]);
+
+  const now = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  els.marketStatus.textContent = ok
+    ? 'UPDATED ' + now + ' · DELAYED PRICES · NOT ADVICE'
+    : '⚠ COULD NOT LOAD PRICES (OFFLINE?) — TAP ↻ REFRESH';
+  marketLoading = false;
+}
+
 function exportPDF() {
   sfx.click();
   // Build synchronously and call print() directly inside the tap handler —
@@ -773,6 +943,8 @@ els.btnIncome.addEventListener('click', () => setType('income'));
 els.reset.addEventListener('click', resetAll);
 els.exportBtn.addEventListener('click', exportPDF);
 els.backupBtn.addEventListener('click', exportBackup);
+els.oracleNext.addEventListener('click', () => { oracleIdx += 1; sfx.click(); renderOracle(); });
+els.marketRefresh.addEventListener('click', () => { sfx.click(); loadMarket(); });
 els.restoreBtn.addEventListener('click', () => els.restoreInput.click());
 els.restoreInput.addEventListener('change', (e) => {
   const f = e.target.files[0];
@@ -832,6 +1004,8 @@ function init() {
   if (state.transactions.length === 0 && !localStorage.getItem(STORE_KEY)) {
     showToast('WELCOME! ADD YOUR FIRST ENTRY ⮞');
   }
+
+  loadMarket(); // best-effort live prices (fails gracefully offline)
 }
 init();
 

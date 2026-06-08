@@ -44,6 +44,12 @@ Export all your data to a `.json` file you can save anywhere, and import it back
 ### 📄 Export to PDF
 One click generates a clean, printable financial report — summary, budget status, savings quest, category breakdown, and a full transaction table — then opens your browser's print dialog so you can **Save as PDF**. Works offline and on mobile; no libraries.
 
+### 🔮 The Oracle (insights & education)
+A retro advisor that reads **your own tracked data** and gives personalised tips — savings rate, biggest spending category, emergency-fund coverage, budget and goal nudges — plus rotating general education on stocks & gold (diversification, dollar-cost averaging, gold as a hedge). Works offline. *Educational only — not financial advice.*
+
+### 📈 Market Watch (live prices)
+Shows the live **gold** price (per oz, via CoinGecko) and a few **stocks/indices** (S&P 500, Apple, Microsoft, via a public proxy). Best-effort: needs internet, prices are delayed, and individual quotes fall back to "N/A" if the free data source is busy. Prices only — not buy/sell calls.
+
 ### 👾 Roaming buddies
 Pac-Man and the four ghosts (drawn as crisp SVG sprites) drift and bounce freely around the screen for extra retro charm — and **scatter in surprise whenever you log a transaction**, then settle back down. They never block clicks, and they respect your "reduced motion" setting.
 
