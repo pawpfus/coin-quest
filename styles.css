@@ -114,6 +114,26 @@ h1 {
 .lives { color: var(--pink); }
 .streak { color: var(--gold); }
 
+/* XP bar under the player row */
+.xp-row {
+  display: flex; align-items: center; gap: 10px;
+  max-width: 320px; margin: 14px auto 0;
+}
+.xp-track {
+  flex: 1; height: 12px; background: var(--bg-2);
+  border: 3px solid var(--shadow); overflow: hidden;
+  box-shadow: inset 2px 2px 0 rgba(0,0,0,.5);
+}
+.xp-fill {
+  display: block; height: 100%; width: 0;
+  background-image: linear-gradient(90deg, var(--gold-dk), var(--gold));
+  background-size: 200% 100%;
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.35);
+  transition: width .55s cubic-bezier(.18,.89,.32,1.28);
+  animation: flow 2.5s linear infinite;
+}
+.xp-next { font-size: 7px; color: var(--ink-dim); white-space: nowrap; }
+
 /* =========================== STAT HUD =========================== */
 .stats {
   display: grid;
@@ -188,6 +208,28 @@ h1 {
   50%{ transform: translate(3px,-2px) rotate(4deg);} 75%{ transform: translate(-2px,-2px) rotate(-2deg);}
 }
 .goal-panel.complete .goal-chest { animation: pop 0.6s ease infinite; }
+
+/* boss takes a hit when you log an expense */
+.boss-panel { position: relative; overflow: hidden; }
+.boss-panel.hit .boss-sprite { animation: bossHit .4s ease; }
+@keyframes bossHit {
+  0%,100% { filter: drop-shadow(3px 3px 0 var(--shadow)); }
+  20% { filter: brightness(6); transform: translate(-4px, -2px); }
+  55% { transform: translate(4px, 0); }
+  80% { transform: translate(-2px, 1px); }
+}
+.dmg-pop {
+  position: absolute; left: 44px; top: 52px; z-index: 2;
+  font-size: 11px; color: #fff;
+  text-shadow: 2px 2px 0 var(--red-dk);
+  pointer-events: none;
+  animation: dmgPop .9s ease forwards;
+}
+@keyframes dmgPop {
+  0%   { opacity: 0; transform: translateY(2px) scale(.6); }
+  20%  { opacity: 1; transform: translateY(-6px) scale(1.15); }
+  100% { opacity: 0; transform: translateY(-38px) scale(1); }
+}
 
 .bar-info { flex: 1; min-width: 0; }
 .bar-name { font-size: 9px; margin-bottom: 10px; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -494,6 +536,25 @@ select { -webkit-appearance: none; appearance: none; cursor: pointer; }
 }
 .danger-btn:hover { background: var(--red); }
 .copyright { font-size: 7px; color: #4a4a7a; letter-spacing: 1px; }
+
+/* =========================== SIDE QUESTS =========================== */
+.quests-panel { margin-bottom: 18px; }
+.quest-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.quest-item {
+  display: grid; grid-template-columns: 26px 1fr auto; gap: 10px; align-items: center;
+  padding: 10px; background: var(--bg-2); border: 3px solid var(--shadow);
+}
+.quest-item.done { border-color: var(--green-dk); background: #14321d; }
+.q-ico { font-size: 17px; text-align: center; }
+.q-body { min-width: 0; }
+.q-name { font-size: 8px; color: var(--ink); display: block; }
+.quest-item.done .q-name { color: var(--green); }
+.q-desc { font-size: 7px; color: var(--ink-dim); display: block; margin: 5px 0 7px; }
+.q-track { display: block; height: 8px; background: var(--bg); border: 2px solid var(--shadow); overflow: hidden; }
+.q-fill { display: block; height: 100%; width: 0; background: var(--gold); transition: width .5s ease; }
+.quest-item.done .q-fill { background: var(--green); }
+.q-status { font-size: 7px; color: var(--ink-dim); white-space: nowrap; }
+.quest-item.done .q-status { color: var(--green); }
 
 /* =========================== ORACLE =========================== */
 .oracle-panel { margin-bottom: 18px; }

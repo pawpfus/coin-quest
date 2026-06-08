@@ -13,7 +13,10 @@ A fully client-side personal finance tracker with a retro Nintendo 8-bit theme. 
 - Live **HUD** showing Balance, Income, and Spent — styled like a game heads-up display
 - **Quest Log** — scrollable transaction history with type filters (All / Earn / Spend) and delete
 - **Spending Map** — animated XP-style bars showing where your money goes
-- **Leveling** — gain a level for every $1,000 earned, with a level-up jingle
+- **Leveling + XP bar** — gain a level for every $1,000 earned, with a live XP bar filling toward the next level and a level-up jingle
+
+### 🗺️ Side Quests
+A panel of auto-tracked challenges (log 5 entries, spend in 3 categories, reach a $5,000 balance, hit a 3-month budget streak, complete a savings quest, and more). Each shows live progress and fires a celebration when you complete it.
 
 ### ⚔️ Budget Boss
 A monthly spending limit rendered as a boss fight. The HP bar **drains as you spend** each month:

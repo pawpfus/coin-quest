@@ -40,7 +40,9 @@ let state = {
   budgetBreached: false,// fired the "over budget" warning already?
   goalCelebrated: false,// fired the "quest complete" jingle already?
   catBudgets: {},       // { categoryId: monthlyLimit } — mini-bosses
+  questsDone: [],       // ids of completed side quests
 };
+let appReady = false;   // true after init, so quests don't celebrate on load
 let currentType = 'expense';
 let currentFilter = 'all';
 let scatterBuddies = () => {}; // assigned by the roaming-buddies system below
@@ -76,8 +78,12 @@ const els = {
   catBudgetSelect: $('catBudgetSelect'), catBudgetInput: $('catBudgetInput'), catBudgetSave: $('catBudgetSave'),
   // world map chart + streak
   chart: $('chart'), monthStreak: $('monthStreak'),
+  // xp
+  xpFill: $('xpFill'), xpNext: $('xpNext'),
   // oracle
   oracleText: $('oracleText'), oracleNext: $('oracleNext'),
+  // side quests
+  questList: $('questList'),
 };
 
 /* ============================================================
@@ -187,6 +193,11 @@ function renderStats(prevLevel) {
 
   const level = levelFor(income);
   els.streak.textContent = 'LV.' + level;
+
+  // XP bar: progress through the current level (1000 income = 1 level)
+  const xpInto = Math.max(0, income) % 1000;
+  els.xpFill.style.width = (xpInto / 1000 * 100) + '%';
+  els.xpNext.textContent = Math.floor(xpInto) + ' / 1000 XP';
 
   [els.balance, els.income, els.expense].forEach((el) => {
     el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse');
@@ -478,13 +489,33 @@ function oracleTips() {
     else if (rate < 10) tips.push('You\'re saving ' + rate + '% of your income. Aim for 20%+ to build wealth faster.');
     else if (rate < 20) tips.push('Solid ' + rate + '% savings rate! Push toward 20% and invest the surplus.');
     else tips.push('🔥 Great ' + rate + '% savings rate! Consider investing the surplus (index funds, gold) for long-term growth.');
+
+    // specific target: how much to trim to reach a 20% savings rate
+    if (rate >= 0 && rate < 20) {
+      const cut = expense - income * 0.8;
+      if (cut > 0) tips.push('💸 To hit a 20% savings rate, trim about ' + fmt(cut) + ' from your total spending.');
+    }
   }
 
-  // top spending category
+  // month-over-month spending trend
+  const now = new Date();
+  const curSpend = monthTotals(now.getFullYear(), now.getMonth()).expense;
+  const lm = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const lastSpend = monthTotals(lm.getFullYear(), lm.getMonth()).expense;
+  if (lastSpend > 0 && curSpend > 0) {
+    const diff = Math.round(((curSpend - lastSpend) / lastSpend) * 100);
+    if (diff > 5) tips.push('📈 Spending is up ' + diff + '% vs last month (' + fmt(curSpend) + ' vs ' + fmt(lastSpend) + '). Watch the leaks.');
+    else if (diff < -5) tips.push('📉 Nice — spending is down ' + Math.abs(diff) + '% vs last month. Bank the difference!');
+  }
+
+  // top spending category + its share
   const spend = {};
   state.transactions.forEach((t) => { if (t.type === 'expense') spend[t.category] = (spend[t.category] || 0) + t.amount; });
   const top = Object.entries(spend).sort((a, b) => b[1] - a[1])[0];
-  if (top) tips.push('Your biggest spend is ' + catInfo('expense', top[0]).name + ' (' + fmt(top[1]) + '). Small cuts there free up cash to invest.');
+  if (top) {
+    const share = expense > 0 ? Math.round((top[1] / expense) * 100) : 0;
+    tips.push('Your biggest spend is ' + catInfo('expense', top[0]).name + ' (' + fmt(top[1]) + ', ' + share + '% of spending). Small cuts there free up cash to invest.');
+  }
 
   // emergency fund coverage
   const avgMonthly = expense / distinctMonths();
@@ -501,13 +532,55 @@ function oracleTips() {
     if (remaining < 0) tips.push('You\'re over budget this month by ' + fmt(Math.abs(remaining)) + '. Rein it in before investing more.');
   }
 
-  // goal nudge
+  // goal pacing — how much per month to reach it
   if (state.goal) {
     const saved = Math.max(0, balance);
-    if (saved < state.goal.target) tips.push('Quest "' + state.goal.name + '": ' + fmt(state.goal.target - saved) + ' to go. Automate a weekly transfer to get there faster.');
+    const remain = state.goal.target - saved;
+    if (remain > 0) {
+      tips.push('🎯 "' + state.goal.name + '": ' + fmt(remain) + ' to go. Save ~' + fmt(remain / 6) + '/month to get there in 6 months.');
+    }
   }
 
   return tips.concat(EDU_TIPS);
+}
+
+/* ---------------- SIDE QUESTS (challenges) ---------------- */
+const CHALLENGES = [
+  { id: 'first',   icon: '🐣', name: 'FIRST STEPS',    desc: 'Log your first entry',        check: () => ({ cur: Math.min(state.transactions.length, 1), goal: 1 }) },
+  { id: 'five',    icon: '📜', name: 'GETTING STARTED', desc: 'Log 5 entries',               check: () => ({ cur: Math.min(state.transactions.length, 5), goal: 5 }) },
+  { id: 'budget',  icon: '🛡️', name: 'BUDGET KEEPER',   desc: 'Set a monthly budget',        check: () => ({ cur: state.budget ? 1 : 0, goal: 1 }) },
+  { id: 'diverse', icon: '🎨', name: 'DIVERSIFIER',     desc: 'Spend in 3 categories',       check: () => ({ cur: Math.min(new Set(state.transactions.filter((t) => t.type === 'expense').map((t) => t.category)).size, 3), goal: 3 }) },
+  { id: 'earn1m',  icon: '💰', name: 'BIG EARNER',      desc: 'Earn $10,000 total',          check: () => ({ cur: Math.min(totals().income, 10000), goal: 10000 }) },
+  { id: 'save5',   icon: '🥚', name: 'NEST EGG',        desc: 'Reach a $5,000 balance',      check: () => ({ cur: Math.min(Math.max(0, totals().balance), 5000), goal: 5000 }) },
+  { id: 'streak3', icon: '🔥', name: 'ON A ROLL',       desc: '3-month budget streak',       check: () => ({ cur: Math.min(streakMonths(), 3), goal: 3 }) },
+  { id: 'quest',   icon: '⭐', name: 'DREAM ACHIEVED',  desc: 'Complete a savings quest',    check: () => ({ cur: (state.goal && totals().balance >= state.goal.target) ? 1 : 0, goal: 1 }) },
+];
+
+function renderQuests() {
+  els.questList.innerHTML = '';
+  CHALLENGES.forEach((c) => {
+    const { cur, goal } = c.check();
+    const done = cur >= goal;
+    const pct = Math.min(100, Math.round((cur / goal) * 100));
+    const row = document.createElement('div');
+    row.className = 'quest-item' + (done ? ' done' : '');
+    row.innerHTML = `
+      <span class="q-ico">${done ? '✅' : c.icon}</span>
+      <span class="q-body">
+        <span class="q-name">${c.name}</span>
+        <span class="q-desc">${c.desc}</span>
+        <span class="q-track"><span class="q-fill" style="width:${pct}%"></span></span>
+      </span>
+      <span class="q-status">${done ? 'DONE' : pct + '%'}</span>`;
+    els.questList.appendChild(row);
+
+    // record completion; celebrate only for quests finished during this session
+    if (done && !state.questsDone.includes(c.id)) {
+      state.questsDone.push(c.id);
+      save();
+      if (appReady) { sfx.victory(); showToast('🗺️ QUEST COMPLETE: ' + c.name + '!'); }
+    }
+  });
 }
 
 let oracleIdx = 0;
@@ -526,6 +599,7 @@ function renderAll(prevLevel) {
   renderMiniBosses();
   renderStreak();
   renderChart();
+  renderQuests();
   renderOracle();
 }
 
@@ -573,6 +647,7 @@ function addTx(e) {
 
   currentType === 'income' ? sfx.coin() : sfx.spend();
   renderAll(prevLevel);
+  if (currentType === 'expense') hitBoss(amount); // boss takes a hit
   scatterBuddies(); // the pixel buddies bolt away in surprise
 
   els.form.reset();
@@ -788,6 +863,7 @@ function importBackup(file) {
       ? { name: String(data.goal.name || 'SAVINGS QUEST'), target: Number(data.goal.target) }
       : null;
     state.catBudgets = (data.catBudgets && typeof data.catBudgets === 'object') ? data.catBudgets : {};
+    state.questsDone = Array.isArray(data.questsDone) ? data.questsDone : [];
     state.soundOn = data.soundOn !== false;
     state.budgetBreached = !!data.budgetBreached;
     state.goalCelebrated = !!data.goalCelebrated;
@@ -834,6 +910,18 @@ function shake(el) {
      { transform: 'translateX(6px)' }, { transform: 'translateX(0)' }],
     { duration: 250 }
   );
+}
+// flash the Budget Boss + float a damage number when an expense lands
+function hitBoss(amount) {
+  if (!state.budget) return;
+  els.bossPanel.classList.remove('hit');
+  void els.bossPanel.offsetWidth;
+  els.bossPanel.classList.add('hit');
+  const pop = document.createElement('span');
+  pop.className = 'dmg-pop';
+  pop.textContent = '-' + fmt(amount);
+  els.bossPanel.appendChild(pop);
+  setTimeout(() => pop.remove(), 900);
 }
 function escapeHtml(s) {
   return s.replace(/[&<>"']/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
@@ -908,6 +996,7 @@ function init() {
   if (state.transactions.length === 0 && !localStorage.getItem(STORE_KEY)) {
     showToast('WELCOME! ADD YOUR FIRST ENTRY ⮞');
   }
+  appReady = true; // from now on, completing a side quest celebrates
 }
 init();
 
