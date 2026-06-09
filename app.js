@@ -97,8 +97,6 @@ const els = {
   // chest + themes
   chestBtn: $('chestBtn'), chestStreak: $('chestStreak'), chestSay: $('chestSay'),
   themeGrid: $('themeGrid'),
-  // pixel kingdom
-  kingdomLabel: $('kingdomLabel'), kingdomScene: $('kingdomScene'), kWeather: $('kWeather'), kGround: $('kGround'),
   // monthly recap
   recapBtn: $('recapBtn'), recapOverlay: $('recapOverlay'), recapClose: $('recapClose'),
   recapMonth: $('recapMonth'), recapGrade: $('recapGrade'), recapRows: $('recapRows'),
@@ -669,31 +667,6 @@ function removeRecurring(id) {
   save(); sfx.delete(); renderRecurring();
 }
 
-/* ---------------- PIXEL KINGDOM (grows with your level) ---------------- */
-const KINGDOM = [
-  { min: 1,  name: 'CAMPSITE',      main: '🏕️', extras: ['🌲'] },
-  { min: 2,  name: 'OUTPOST',       main: '⛺', extras: ['🌲', '🌳'] },
-  { min: 4,  name: 'HOMESTEAD',     main: '🏠', extras: ['🌳', '🌲', '🐑'] },
-  { min: 6,  name: 'VILLAGE',       main: '🏘️', extras: ['🌳', '🏠', '🌲', '🧍'] },
-  { min: 9,  name: 'CASTLE',        main: '🏰', extras: ['🌳', '🏠', '🌲', '🧍', '🐴'] },
-  { min: 13, name: 'GRAND KINGDOM', main: '🏰', extras: ['🚩', '🏠', '🏘️', '🌳', '🧍', '🐴'] },
-];
-function renderKingdom() {
-  const level = levelFor(totals().income);
-  const over = state.budget && (state.budget - monthSpend()) < 0;
-  let tier = KINGDOM[0];
-  for (const k of KINGDOM) if (level >= k.min) tier = k;
-  els.kingdomLabel.textContent = 'LV.' + level + ' · ' + tier.name;
-  els.kWeather.textContent = over ? '⛈️' : (level >= 6 ? '☀️' : '🌤️');
-  els.kingdomScene.classList.toggle('storm', !!over);
-  const ex = tier.extras;
-  const half = Math.ceil(ex.length / 2);
-  els.kGround.innerHTML =
-    ex.slice(0, half).map((e) => `<span>${e}</span>`).join('') +
-    `<span class="k-main">${tier.main}</span>` +
-    ex.slice(half).map((e) => `<span>${e}</span>`).join('');
-}
-
 /* ---------------- DAILY CHEST ---------------- */
 const todayStr = () => new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD (local)
 const chestAvailable = () => state.lastChest !== todayStr();
@@ -805,7 +778,6 @@ function renderAll(prevLevel) {
   renderChart();
   renderQuests();
   renderRecurring();
-  renderKingdom();
   renderOracle();
   renderThemes();
   renderChest();

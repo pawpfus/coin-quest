@@ -35,9 +35,6 @@ Set a named savings goal and watch a golden treasure bar fill toward it:
 - Progress tracks your balance vs. the target
 - 🏆 Completing a quest fires a victory jingle and celebration toast
 
-### 🏰 Pixel Kingdom
-A little 8-bit world (campsite → outpost → homestead → village → castle → grand kingdom) that grows as you level up, and turns stormy/grey when you blow the budget.
-
 ### 📜 Monthly Recap
 A "LEVEL COMPLETE" results card for the current month — earned, spent, saved, savings-rate grade (S/A/B/C/D), budget result, and top category — styled to screenshot and share.
 
