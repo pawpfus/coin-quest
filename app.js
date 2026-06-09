@@ -1553,6 +1553,17 @@ function cycleMusic() {
 }
 els.music.addEventListener('click', cycleMusic);
 setMusicLabel();
+
+// stop the music loop when the app is hidden/backgrounded; resume if it was on
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    stopMusic();
+    if (audioCtx && audioCtx.state === 'running') audioCtx.suspend();
+  } else if (state.musicOn) {
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    startMusic();
+  }
+});
 // browsers block audio until a gesture — if music was on last session, start on first interaction
 if (state.musicOn) {
   const kick = () => { startMusic(); window.removeEventListener('pointerdown', kick); window.removeEventListener('keydown', kick); };
