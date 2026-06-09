@@ -1583,8 +1583,10 @@ if (state.musicOn) {
   const COLORS = ['#ffffff', '#ffffff', '#ffd23f', '#4fa9ff', '#b06bff'];
   let w, h, stars;
   function resize() {
-    w = cv.width = window.innerWidth;
-    h = cv.height = window.innerHeight;
+    const W = window.innerWidth, H = window.innerHeight;
+    if (!W || !H) { setTimeout(resize, 250); return; } // mobile viewport not ready yet — retry
+    w = cv.width = W;
+    h = cv.height = H;
     const count = Math.max(28, Math.round((w * h) / 14000));
     stars = [];
     for (let i = 0; i < count; i++) {
@@ -1612,7 +1614,7 @@ if (state.musicOn) {
       dusk:  { sky: '255,111,145', skyA: 0.34, starMul: 0.55, body: 'sun',  bodyCol: '#ff9e6b' },
       night: { sky: '26,26,85',    skyA: 0.22, starMul: 1,    body: 'moon', bodyCol: '#e8e8ff' },
     }[p];
-    return Object.assign({ hf }, cfg);
+    return Object.assign({ hf, name: p }, cfg);
   }
   function drawBody(type, x, y, col) {
     ctx.save();
@@ -1628,9 +1630,13 @@ if (state.musicOn) {
     }
     ctx.restore();
   }
+  let lastPhase = '';
   function paint(animate) {
     ctx.clearRect(0, 0, w, h);
     const ph = phaseInfo();
+    // tag the page so CSS can tint the whole background by phase (visible on mobile
+    // where panels cover most of the canvas)
+    if (ph.name !== lastPhase) { lastPhase = ph.name; document.documentElement.dataset.daynight = ph.name; }
     // sky tint (top glow) for the time of day
     const g = ctx.createLinearGradient(0, 0, 0, h * 0.5);
     g.addColorStop(0, `rgba(${ph.sky},${ph.skyA})`);
@@ -1648,8 +1654,20 @@ if (state.musicOn) {
     }
     ctx.globalAlpha = 1;
   }
-  function loop() { paint(true); requestAnimationFrame(loop); }
+  function loop() {
+    // self-heal: mobile browsers can settle the viewport after load without a
+    // usable resize event, leaving the canvas 0x0 or stale — fix it every frame
+    if (cv.width !== window.innerWidth || cv.height !== window.innerHeight) resize();
+    paint(true);
+    requestAnimationFrame(loop);
+  }
   resize();
   window.addEventListener('resize', resize);
-  if (reduce) paint(false); else requestAnimationFrame(loop);
+  window.addEventListener('orientationchange', () => setTimeout(resize, 300));
+  if (reduce) {
+    paint(false);
+    setInterval(() => { resize(); paint(false); }, 60000); // keep phase current without animation
+  } else {
+    requestAnimationFrame(loop);
+  }
 })();

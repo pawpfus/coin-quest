@@ -37,6 +37,28 @@ html {
   transition: background-color .3s;
 }
 
+/* day/night page tint (set via data-daynight by the starfield) — layered over
+   the theme background so it stays visible on mobile where panels cover the canvas */
+html[data-daynight="dawn"] {
+  background:
+    linear-gradient(180deg, rgba(255, 158, 107, .20) 0%, rgba(255, 158, 107, 0) 45%),
+    radial-gradient(circle at 50% 0%, var(--panel) 0%, var(--bg) 60%),
+    var(--bg);
+}
+html[data-daynight="day"] {
+  background:
+    linear-gradient(180deg, rgba(91, 139, 224, .22) 0%, rgba(91, 139, 224, 0) 50%),
+    radial-gradient(circle at 50% 0%, var(--panel) 0%, var(--bg) 60%),
+    var(--bg);
+}
+html[data-daynight="dusk"] {
+  background:
+    linear-gradient(180deg, rgba(255, 111, 145, .20) 0%, rgba(255, 111, 145, 0) 45%),
+    radial-gradient(circle at 50% 0%, var(--panel) 0%, var(--bg) 60%),
+    var(--bg);
+}
+/* night uses the default background */
+
 body {
   font-family: 'Press Start 2P', monospace;
   background: transparent;
