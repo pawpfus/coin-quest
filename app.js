@@ -1282,9 +1282,11 @@ if ('serviceWorker' in navigator) {
    CHIPTUNE BACKGROUND MUSIC (generated live, looping)
 ============================================================ */
 const N2F = (n) => 440 * Math.pow(2, (n - 69) / 12); // MIDI note -> frequency
-const MEL  = [72, 76, 79, 84, 81, 79, 76, 0, 74, 72, 76, 79, 76, 74, 72, 0]; // C-major pentatonic
-const BASS = [48, 0, 0, 0, 45, 0, 0, 0, 43, 0, 0, 0, 45, 0, 0, 0];
-const STEP_MS = 200;
+// space ambient: slow Am–F–C–G sine pad, sparse soft lead, twinkling stars
+const PAD     = [45, 0, 0, 0, 41, 0, 0, 0, 48, 0, 0, 0, 43, 0, 0, 0]; // chord roots
+const LEAD    = [0, 0, 76, 79, 0, 81, 79, 76, 0, 0, 72, 74, 0, 76, 74, 72];
+const TWINKLE = [81, 84, 88, 91]; // high A-minor-pentatonic sparkles
+const STEP_MS = 300;
 const music = { timer: null, step: 0 };
 
 function mNote(freq, dur, type, vol) {
@@ -1302,10 +1304,17 @@ function mNote(freq, dur, type, vol) {
   } catch (e) { /* audio unavailable */ }
 }
 function musicTick() {
-  const m = MEL[music.step % MEL.length];
-  const b = BASS[music.step % BASS.length];
-  if (m) mNote(N2F(m), 0.18, 'square', 0.035);
-  if (b) mNote(N2F(b), 0.42, 'triangle', 0.045);
+  const i = music.step % 16;
+  const pad = PAD[i];
+  if (pad) {                                   // soft sine pad chord (root + fifth)
+    mNote(N2F(pad), 1.5, 'sine', 0.05);
+    mNote(N2F(pad + 7), 1.5, 'sine', 0.03);
+  }
+  const m = LEAD[i];
+  if (m) mNote(N2F(m), 0.55, 'triangle', 0.038); // gentle lead
+  if (Math.random() < 0.2) {                     // occasional star twinkle
+    mNote(N2F(TWINKLE[Math.floor(Math.random() * TWINKLE.length)]), 0.3, 'sine', 0.022);
+  }
   music.step += 1;
 }
 function startMusic() {
