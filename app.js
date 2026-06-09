@@ -503,6 +503,11 @@ const EDU_TIPS = [
   '💡 Only invest money you won\'t need for 5+ years in stocks; keep short-term savings in cash or gold.',
   '💡 Gold pays no dividends or interest — it\'s a store of value, not an income source. Balance it with assets that grow.',
   '💡 All good until our daily caffeine spending & government boondoggle foreshadows doom.',
+  '💡 The 50/30/20 rule: 50% needs, 30% wants, 20% savings — a simple map to start your quest.',
+  '💡 Automate the win: schedule a savings transfer on payday, so saving happens before spending can.',
+  '💡 Inflation is a silent boss battle — idle cash loses HP every year. Make long-term money work.',
+  '💡 An emergency fund isn\'t an investment — it\'s armor. Keep it boring, liquid, and reachable.',
+  '💡 Track first, judge later: a month of honest logging beats a year of guessing.',
 ];
 
 function distinctMonths() {
@@ -575,6 +580,86 @@ function oracleTips() {
     if (remain > 0) {
       tips.push('🎯 "' + state.goal.name + '": ' + fmt(remain) + ' to go. Save ~' + fmt(remain / 6) + '/month to get there in 6 months.');
     }
+  }
+
+  // month-end projection — current pace extrapolated over the whole month
+  const dayOfMonth = now.getDate();
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  if (dayOfMonth >= 5 && curSpend > 0 && dayOfMonth < daysInMonth) {
+    const proj = (curSpend / dayOfMonth) * daysInMonth;
+    if (state.budget) {
+      tips.push(proj > state.budget
+        ? '📅 At this pace you\'ll spend ~' + fmt(proj) + ' this month — bursting your ' + fmt(state.budget) + ' budget. Slow the dragon!'
+        : '📅 At this pace you\'ll spend ~' + fmt(proj) + ' this month — safely inside your budget. Keep it up!');
+    } else {
+      tips.push('📅 At this pace you\'ll spend ~' + fmt(proj) + ' this month.');
+    }
+  }
+
+  // goal ETA at the actual saving pace
+  if (state.goal && Math.max(0, balance) < state.goal.target) {
+    const monthlySave = (income - expense) / distinctMonths();
+    if (monthlySave > 0) {
+      const eta = Math.ceil((state.goal.target - Math.max(0, balance)) / monthlySave);
+      tips.push('🗺️ At your real pace (~' + fmt(monthlySave) + '/mo saved), "' + state.goal.name + '" is about ' + eta + ' month' + (eta > 1 ? 's' : '') + ' away.');
+    }
+  }
+
+  // biggest single expense ever
+  const expenses = state.transactions.filter((t) => t.type === 'expense');
+  if (expenses.length >= 3) {
+    const big = expenses.reduce((a, b) => (b.amount > a.amount ? b : a));
+    tips.push('💥 Your biggest single hit: ' + big.desc + ' (' + fmt(big.amount) + '). Sleep a night on purchases that size before striking.');
+  }
+
+  // no-spend days this month
+  if (dayOfMonth >= 7) {
+    const spendDays = new Set();
+    state.transactions.forEach((t) => {
+      const d = new Date(t.id);
+      if (t.type === 'expense' && d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()) spendDays.add(d.getDate());
+    });
+    const noSpend = dayOfMonth - spendDays.size;
+    if (noSpend > 0) tips.push('🛡️ ' + noSpend + ' no-spend day' + (noSpend > 1 ? 's' : '') + ' so far this month. Each one is a free win — chain them like a combo.');
+  }
+
+  // the latte factor — many small purchases (under half the average expense)
+  if (expenses.length >= 8) {
+    const avgExp = expense / expenses.length;
+    const small = expenses.filter((t) => t.amount < avgExp * 0.5);
+    const smallTotal = small.reduce((s, t) => s + t.amount, 0);
+    const smallShare = expense > 0 ? Math.round((smallTotal / expense) * 100) : 0;
+    if (small.length >= 5 && smallShare >= 15) {
+      tips.push('🧋 ' + small.length + ' small purchases quietly add up to ' + fmt(smallTotal) + ' (' + smallShare + '% of all spending). Little leaks sink big ships.');
+    }
+  }
+
+  // weekend spending share
+  if (expenses.length >= 8) {
+    let we = 0;
+    expenses.forEach((t) => { const dw = new Date(t.id).getDay(); if (dw === 0 || dw === 6) we += t.amount; });
+    const weShare = expense > 0 ? Math.round((we / expense) * 100) : 0;
+    if (weShare >= 40) tips.push('🎉 ' + weShare + '% of your spending happens on weekends (2 days out of 7). Plan weekend fun with a cap.');
+  }
+
+  // best savings month on record
+  const monthKeys = new Set();
+  state.transactions.forEach((t) => { const d = new Date(t.id); monthKeys.add(d.getFullYear() * 12 + d.getMonth()); });
+  if (monthKeys.size >= 2) {
+    let best = null;
+    monthKeys.forEach((k) => {
+      const y = Math.floor(k / 12), m = k % 12;
+      const mt = monthTotals(y, m);
+      const net = mt.income - mt.expense;
+      if (!best || net > best.net) best = { y, m, net };
+    });
+    if (best && best.net > 0) tips.push('🏅 Your best month on record: ' + MONTHS[best.m] + ' ' + best.y + ' (saved ' + fmt(best.net) + '). Can you beat your high score?');
+  }
+
+  // income concentration — nudge toward a second stream
+  const incomeCats = new Set(state.transactions.filter((t) => t.type === 'income').map((t) => t.category));
+  if (incomeCats.size === 1 && state.transactions.filter((t) => t.type === 'income').length >= 3) {
+    tips.push('💼 All your income flows from one source. A side quest income stream is the best armor against surprises.');
   }
 
   return tips.concat(EDU_TIPS);
