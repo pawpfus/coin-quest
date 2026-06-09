@@ -47,7 +47,6 @@ let state = {
   lastChest: null,      // YYYY-MM-DD of last daily-chest open
   chestStreak: 0,       // consecutive days opening the chest
   rainbow: false,       // konami-code rainbow mode
-  relicsSeen: [],       // relics already announced as earned
 };
 let appReady = false;   // true after init, so quests don't celebrate on load
 let currentType = 'expense';
@@ -86,6 +85,8 @@ const els = {
   catBudgetSelect: $('catBudgetSelect'), catBudgetInput: $('catBudgetInput'), catBudgetSave: $('catBudgetSave'),
   // world map chart + streak
   chart: $('chart'), monthStreak: $('monthStreak'),
+  // spending heatmap
+  heatMonth: $('heatMonth'), heatGrid: $('heatGrid'),
   // xp
   xpFill: $('xpFill'), xpNext: $('xpNext'),
   // oracle
@@ -98,8 +99,6 @@ const els = {
   // monthly recap
   recapBtn: $('recapBtn'), recapOverlay: $('recapOverlay'), recapClose: $('recapClose'),
   recapMonth: $('recapMonth'), recapGrade: $('recapGrade'), recapRows: $('recapRows'),
-  // relics
-  relicGrid: $('relicGrid'),
 };
 
 /* ============================================================
@@ -445,6 +444,34 @@ function renderStreak() {
   els.monthStreak.textContent = '🔥 ' + s + ' MO';
 }
 
+/* ---------------- SPENDING HEATMAP (current month) ---------------- */
+function renderHeatmap() {
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth();
+  els.heatMonth.textContent = MONTHS[m] + ' ' + y;
+  const daysIn = new Date(y, m + 1, 0).getDate();
+  const firstDow = new Date(y, m, 1).getDay();
+  const daily = {};
+  state.transactions.forEach((t) => {
+    if (t.type !== 'expense') return;
+    const d = new Date(t.id);
+    if (d.getFullYear() === y && d.getMonth() === m) daily[d.getDate()] = (daily[d.getDate()] || 0) + t.amount;
+  });
+  const max = Math.max(1, ...Object.values(daily));
+  const today = now.getDate();
+  let html = '';
+  for (let i = 0; i < firstDow; i++) html += '<span class="heat-cell blank"></span>';
+  for (let d = 1; d <= daysIn; d++) {
+    const v = daily[d] || 0;
+    const has = v > 0;
+    const alpha = has ? (0.2 + 0.8 * (v / max)).toFixed(2) : 0;
+    const style = has ? `background-color:rgba(255,210,63,${alpha})` : '';
+    const cls = 'heat-cell' + (d === today ? ' today' : '') + (has ? ' has' : '');
+    html += `<span class="${cls}" style="${style}" title="${MONTHS[m]} ${d}: ${fmt(v)}">${d}</span>`;
+  }
+  els.heatGrid.innerHTML = html;
+}
+
 /* ---------------- WORLD MAP CHART (last 6 months) ---------------- */
 function kfmt(n) {
   if (n >= 1000) return '$' + (n / 1000).toFixed(n % 1000 === 0 ? 0 : 1) + 'k';
@@ -732,30 +759,6 @@ function activateCheat() {
   else { sfx.click(); showToast('RAINBOW MODE OFF'); }
 }
 
-/* ---------------- RELIC VAULT ---------------- */
-const RELICS = [
-  { id: 'gem',    icon: '💎', name: 'GEM OF THRIFT',      has: () => Math.max(0, totals().balance) >= 1000 },
-  { id: 'sword',  icon: '⚔️', name: 'BLADE OF INCOME',    has: () => totals().income >= 10000 },
-  { id: 'scroll', icon: '📜', name: 'SCROLL OF DISCIPLINE', has: () => streakMonths() >= 3 },
-  { id: 'shield', icon: '🛡️', name: 'SHIELD OF BUDGET',   has: () => !!state.budget && monthSpend() > 0 && (state.budget - monthSpend()) >= 0 },
-  { id: 'crown',  icon: '👑', name: 'CROWN OF WEALTH',     has: () => levelFor(totals().income) >= 10 },
-  { id: 'trophy', icon: '🏆', name: 'QUEST TROPHY',        has: () => state.questsDone.length >= CHALLENGES.length },
-];
-function renderRelics() {
-  els.relicGrid.innerHTML = '';
-  RELICS.forEach((r) => {
-    const earned = !!r.has();
-    if (earned && !state.relicsSeen.includes(r.id)) {
-      state.relicsSeen.push(r.id); save();
-      if (appReady) { sfx.victory(); coinRain(30); showToast('🎒 RELIC EARNED: ' + r.name + '!'); }
-    }
-    const cell = document.createElement('div');
-    cell.className = 'relic ' + (earned ? 'earned' : 'locked');
-    cell.innerHTML = `<span class="r-emoji">${earned ? r.icon : '🔒'}</span><span class="r-title">${earned ? r.name : '???'}</span>`;
-    els.relicGrid.appendChild(cell);
-  });
-}
-
 /* ---------------- RANDOM ENCOUNTERS ---------------- */
 const ENCOUNTERS = [
   { msg: '🧙 A wandering merchant nods approvingly.', coins: 0 },
@@ -773,13 +776,13 @@ function maybeEncounter() {
 
 function renderAll(prevLevel) {
   renderStats(prevLevel);
-  renderRelics();
   renderList();
   renderCats();
   renderBudget();
   renderGoal();
   renderMiniBosses();
   renderStreak();
+  renderHeatmap();
   renderChart();
   renderQuests();
   renderOracle();
@@ -1082,7 +1085,6 @@ function importBackup(file) {
     state.lastChest = data.lastChest || null;
     state.chestStreak = Number(data.chestStreak) || 0;
     state.rainbow = !!data.rainbow;
-    state.relicsSeen = Array.isArray(data.relicsSeen) ? data.relicsSeen : [];
     applyTheme(state.theme);
     document.body.classList.toggle('rainbow', state.rainbow);
     state.soundOn = data.soundOn !== false;
