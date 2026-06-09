@@ -439,6 +439,27 @@ input[type=number] { -moz-appearance: textfield; }
 }
 select { -webkit-appearance: none; appearance: none; cursor: pointer; }
 
+/* repeat-monthly checkbox */
+.repeat-field {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 8px; color: var(--ink-dim); cursor: pointer;
+  margin-bottom: 16px; letter-spacing: 1px;
+}
+.repeat-field input { width: 18px; height: 18px; flex: 0 0 auto; accent-color: var(--gold); cursor: pointer; padding: 0; }
+
+/* recurring list */
+.recurring-row {
+  display: grid; grid-template-columns: 28px 1fr auto auto; align-items: center; gap: 10px;
+  padding: 10px; background: var(--bg-2); border: 3px solid var(--shadow); margin-bottom: 8px;
+}
+.recurring-row .r-ico { font-size: 16px; text-align: center; }
+.recurring-row .r-name { font-size: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.recurring-row .r-amt { font-size: 9px; white-space: nowrap; }
+.recurring-row .r-amt.income { color: var(--green); }
+.recurring-row .r-amt.expense { color: var(--red); }
+.recurring-row .r-del { font-family: inherit; font-size: 10px; background: transparent; border: none; color: #5b5b8f; cursor: pointer; }
+.recurring-row .r-del:hover { color: var(--red); }
+
 /* big action button */
 .submit-btn {
   font-family: inherit;
@@ -507,12 +528,13 @@ select { -webkit-appearance: none; appearance: none; cursor: pointer; }
 .tx-amount.income  { color: var(--green); }
 .tx-amount.expense { color: var(--red); }
 
-.tx-del {
+.tx-del, .tx-edit {
   font-family: inherit; font-size: 10px;
   background: transparent; border: none; color: #5b5b8f;
   cursor: pointer; padding: 4px 6px; flex-shrink: 0;
 }
 .tx-del:hover { color: var(--red); }
+.tx-edit:hover { color: var(--gold); }
 
 .empty-state { text-align: center; color: var(--ink-dim); padding: 30px 10px; }
 .empty-state.small { padding: 14px; }
@@ -621,6 +643,43 @@ select { -webkit-appearance: none; appearance: none; cursor: pointer; }
 .fl-inner { display: block; animation: flBob 1.5s ease-in-out infinite; }
 @keyframes flBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 
+/* =========================== MONTHLY RECAP =========================== */
+.recap-overlay {
+  position: fixed; inset: 0; z-index: 1002;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(5, 5, 16, 0.82); padding: 20px;
+  animation: fadeIn .25s ease;
+}
+.recap-overlay[hidden] { display: none; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.recap-card {
+  position: relative; width: 100%; max-width: 360px;
+  background: var(--panel); border: 4px solid var(--shadow);
+  box-shadow: 0 0 0 4px var(--gold-dk), 6px 6px 0 var(--shadow);
+  padding: 22px 20px; text-align: center;
+  animation: pop .35s cubic-bezier(.18,.89,.32,1.28);
+}
+.recap-close {
+  position: absolute; top: 8px; right: 10px;
+  font-family: inherit; font-size: 12px; background: transparent; border: none;
+  color: var(--ink-dim); cursor: pointer;
+}
+.recap-close:hover { color: var(--red); }
+.recap-head { font-size: 11px; color: var(--gold); letter-spacing: 1px; text-shadow: 2px 2px 0 var(--shadow); animation: blink 1s steps(2) infinite; }
+.recap-month { font-size: 9px; color: var(--ink-dim); margin-top: 10px; letter-spacing: 2px; }
+.recap-grade {
+  font-size: 56px; margin: 12px 0; color: var(--gold);
+  text-shadow: 3px 3px 0 var(--shadow);
+}
+.recap-grade.g-s { color: #ffd23f; } .recap-grade.g-a { color: #4be35a; }
+.recap-grade.g-b { color: #4fa9ff; } .recap-grade.g-c { color: #b06bff; }
+.recap-grade.g-d { color: #ff5d5d; }
+.recap-rows { display: flex; flex-direction: column; gap: 2px; margin: 6px 0 16px; }
+.recap-row { display: flex; justify-content: space-between; gap: 12px; font-size: 8px; padding: 7px 4px; border-bottom: 1px dotted var(--panel-lt); }
+.recap-row span:first-child { color: var(--ink-dim); }
+.recap-row span:last-child { color: var(--ink); }
+.recap-foot { font-size: 7px; color: var(--ink-dim); letter-spacing: 1px; }
+
 /* =========================== TOAST =========================== */
 .toast {
   position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 120px);
@@ -701,6 +760,25 @@ select { -webkit-appearance: none; appearance: none; cursor: pointer; }
 .pr-table tr { break-inside: avoid; }
 
 .pr-foot { margin-top: 20px; border-top: 3px double #111; padding-top: 10px; text-align: center; font-size: 15px; color: #555; }
+
+/* =========================== PIXEL KINGDOM =========================== */
+.kingdom-panel { margin-bottom: 18px; }
+.kingdom-label { font-size: 8px; color: var(--gold); }
+.kingdom-scene {
+  position: relative; height: 130px; overflow: hidden;
+  border: 3px solid var(--shadow);
+  background: linear-gradient(180deg, #14225c 0%, #2a3b80 50%, #6b4aa0 72%, #5a4326 72%, #2e2012 100%);
+  box-shadow: inset 2px 2px 0 rgba(0,0,0,.45);
+  transition: filter .4s;
+}
+.kingdom-scene.storm { filter: grayscale(.7) brightness(.65); }
+.k-weather { position: absolute; top: 8px; right: 12px; font-size: 24px; filter: drop-shadow(2px 2px 0 var(--shadow)); animation: hover 3s ease-in-out infinite; }
+.k-ground {
+  position: absolute; left: 0; right: 0; bottom: 8px;
+  display: flex; align-items: flex-end; justify-content: center; gap: 6px; flex-wrap: nowrap;
+}
+.k-ground span { font-size: 30px; line-height: 1; filter: drop-shadow(2px 2px 0 var(--shadow)); animation: hover 2.6s ease-in-out infinite; }
+.k-ground .k-main { font-size: 46px; }
 
 /* =========================== DAILY CHEST =========================== */
 .chest-stage { display: flex; align-items: center; gap: 14px; }

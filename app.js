@@ -47,10 +47,12 @@ let state = {
   lastChest: null,      // YYYY-MM-DD of last daily-chest open
   chestStreak: 0,       // consecutive days opening the chest
   rainbow: false,       // konami-code rainbow mode
+  recurring: [],        // monthly auto-add templates {id,type,desc,amount,category,lastMonth}
 };
 let appReady = false;   // true after init, so quests don't celebrate on load
 let currentType = 'expense';
 let currentFilter = 'all';
+let editingId = null; // id of the transaction being edited (null = adding new)
 let scatterBuddies = () => {}; // assigned by the roaming-buddies system below
 
 /* ---------------- elements ---------------- */
@@ -90,9 +92,16 @@ const els = {
   oracleText: $('oracleText'), oracleNext: $('oracleNext'),
   // side quests
   questList: $('questList'),
+  // recurring
+  repeatInput: $('repeatInput'), recurringList: $('recurringList'), recurringEmpty: $('recurringEmpty'),
   // chest + themes
   chestBtn: $('chestBtn'), chestStreak: $('chestStreak'), chestSay: $('chestSay'),
   themeGrid: $('themeGrid'),
+  // pixel kingdom
+  kingdomLabel: $('kingdomLabel'), kingdomScene: $('kingdomScene'), kWeather: $('kWeather'), kGround: $('kGround'),
+  // monthly recap
+  recapBtn: $('recapBtn'), recapOverlay: $('recapOverlay'), recapClose: $('recapClose'),
+  recapMonth: $('recapMonth'), recapGrade: $('recapGrade'), recapRows: $('recapRows'),
 };
 
 /* ============================================================
@@ -164,6 +173,7 @@ function levelFor(income) {
 const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
 
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const curMonthIdx = () => { const n = new Date(); return n.getFullYear() * 12 + n.getMonth(); };
 
 // income + expense totals for a given year/month (optionally a single category)
 function monthTotals(y, m, category) {
@@ -245,6 +255,7 @@ function renderList() {
         <span class="tx-meta">${c.name} · ${date}</span>
       </span>
       <span class="tx-amount ${t.type}">${t.type === 'income' ? '+' : '-'}${fmt(t.amount).replace('-','')}</span>
+      <button class="tx-edit" title="Edit" data-id="${t.id}">✎</button>
       <button class="tx-del" title="Delete" data-id="${t.id}">✕</button>
     `;
     els.list.appendChild(li);
@@ -624,6 +635,65 @@ function renderOracle() {            // instant update from renderAll — don't 
 }
 function typeOracle() { typewrite(els.oracleText, currentTip()); } // animated (NEXT / first load)
 
+/* ---------------- RECURRING ENTRIES ---------------- */
+function applyRecurring() {
+  const idx = curMonthIdx();
+  let added = 0;
+  state.recurring.forEach((r, i) => {
+    if (r.lastMonth !== idx) {
+      state.transactions.push({ id: Date.now() + i + 1, type: r.type, desc: r.desc, amount: r.amount, category: r.category });
+      r.lastMonth = idx;
+      added += 1;
+    }
+  });
+  if (added) save();
+  return added;
+}
+function renderRecurring() {
+  els.recurringEmpty.style.display = state.recurring.length ? 'none' : 'block';
+  els.recurringList.innerHTML = '';
+  state.recurring.forEach((r) => {
+    const c = catInfo(r.type, r.category);
+    const row = document.createElement('div');
+    row.className = 'recurring-row';
+    row.innerHTML = `
+      <span class="r-ico">${c.icon}</span>
+      <span class="r-name">${escapeHtml(r.desc)} · ${c.name}</span>
+      <span class="r-amt ${r.type}">${r.type === 'income' ? '+' : '-'}${fmt(r.amount).replace('-', '')}/mo</span>
+      <button class="r-del" title="Remove" data-id="${r.id}">✕</button>`;
+    els.recurringList.appendChild(row);
+  });
+}
+function removeRecurring(id) {
+  state.recurring = state.recurring.filter((r) => r.id !== Number(id));
+  save(); sfx.delete(); renderRecurring();
+}
+
+/* ---------------- PIXEL KINGDOM (grows with your level) ---------------- */
+const KINGDOM = [
+  { min: 1,  name: 'CAMPSITE',      main: '🏕️', extras: ['🌲'] },
+  { min: 2,  name: 'OUTPOST',       main: '⛺', extras: ['🌲', '🌳'] },
+  { min: 4,  name: 'HOMESTEAD',     main: '🏠', extras: ['🌳', '🌲', '🐑'] },
+  { min: 6,  name: 'VILLAGE',       main: '🏘️', extras: ['🌳', '🏠', '🌲', '🧍'] },
+  { min: 9,  name: 'CASTLE',        main: '🏰', extras: ['🌳', '🏠', '🌲', '🧍', '🐴'] },
+  { min: 13, name: 'GRAND KINGDOM', main: '🏰', extras: ['🚩', '🏠', '🏘️', '🌳', '🧍', '🐴'] },
+];
+function renderKingdom() {
+  const level = levelFor(totals().income);
+  const over = state.budget && (state.budget - monthSpend()) < 0;
+  let tier = KINGDOM[0];
+  for (const k of KINGDOM) if (level >= k.min) tier = k;
+  els.kingdomLabel.textContent = 'LV.' + level + ' · ' + tier.name;
+  els.kWeather.textContent = over ? '⛈️' : (level >= 6 ? '☀️' : '🌤️');
+  els.kingdomScene.classList.toggle('storm', !!over);
+  const ex = tier.extras;
+  const half = Math.ceil(ex.length / 2);
+  els.kGround.innerHTML =
+    ex.slice(0, half).map((e) => `<span>${e}</span>`).join('') +
+    `<span class="k-main">${tier.main}</span>` +
+    ex.slice(half).map((e) => `<span>${e}</span>`).join('');
+}
+
 /* ---------------- DAILY CHEST ---------------- */
 const todayStr = () => new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD (local)
 const chestAvailable = () => state.lastChest !== todayStr();
@@ -734,6 +804,8 @@ function renderAll(prevLevel) {
   renderStreak();
   renderChart();
   renderQuests();
+  renderRecurring();
+  renderKingdom();
   renderOracle();
   renderThemes();
   renderChest();
@@ -764,11 +836,40 @@ function setType(type) {
   sfx.click();
 }
 
+function submitLabel() { return currentType === 'income' ? '⮞ COLLECT GOLD' : '⮞ ADD ENTRY'; }
+
+function startEdit(id) {
+  const tx = state.transactions.find((t) => t.id === Number(id));
+  if (!tx) return;
+  editingId = tx.id;
+  setType(tx.type);
+  if (els.repeatInput) els.repeatInput.checked = false;
+  els.desc.value = tx.desc;
+  els.amount.value = tx.amount;
+  els.category.value = tx.category;
+  els.submit.textContent = '✓ SAVE EDIT';
+  els.form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  els.desc.focus();
+}
+
 function addTx(e) {
   e.preventDefault();
   const desc = els.desc.value.trim();
   const amount = parseFloat(els.amount.value);
   if (!desc || !(amount > 0)) { sfx.error(); shake(els.form); return; }
+
+  // edit mode: update the existing entry and exit
+  if (editingId != null) {
+    const tx = state.transactions.find((t) => t.id === editingId);
+    if (tx) { tx.type = currentType; tx.desc = desc; tx.amount = amount; tx.category = els.category.value; }
+    editingId = null;
+    save(); sfx.click();
+    renderAll();
+    els.form.reset();
+    els.submit.textContent = submitLabel();
+    showToast('✓ ENTRY UPDATED');
+    return;
+  }
 
   const prevLevel = levelFor(totals().income);
 
@@ -779,6 +880,11 @@ function addTx(e) {
     amount,
     category: els.category.value,
   });
+  // optionally register as a monthly recurring template
+  if (els.repeatInput && els.repeatInput.checked) {
+    state.recurring.push({ id: Date.now() + 1, type: currentType, desc, amount, category: els.category.value, lastMonth: curMonthIdx() });
+    els.repeatInput.checked = false;
+  }
   save();
 
   currentType === 'income' ? sfx.coin() : sfx.spend();
@@ -1000,6 +1106,7 @@ function importBackup(file) {
       : null;
     state.catBudgets = (data.catBudgets && typeof data.catBudgets === 'object') ? data.catBudgets : {};
     state.questsDone = Array.isArray(data.questsDone) ? data.questsDone : [];
+    state.recurring = Array.isArray(data.recurring) ? data.recurring : [];
     state.theme = data.theme || 'default';
     state.themesSeen = Array.isArray(data.themesSeen) ? data.themesSeen : [];
     state.lastChest = data.lastChest || null;
@@ -1022,6 +1129,51 @@ function importBackup(file) {
   reader.onerror = () => { sfx.error(); showToast('⚠ COULD NOT READ FILE'); };
   reader.readAsText(file);
 }
+
+/* ---- monthly recap card ---- */
+function openRecap() {
+  sfx.click();
+  const now = new Date();
+  const { income, expense } = monthTotals(now.getFullYear(), now.getMonth());
+  const net = income - expense;
+  const rate = income > 0 ? Math.round((net / income) * 100) : 0;
+
+  let grade = 'C';
+  if (income === 0 && expense === 0) grade = '—';
+  else if (rate >= 40) grade = 'S';
+  else if (rate >= 25) grade = 'A';
+  else if (rate >= 10) grade = 'B';
+  else if (rate >= 0) grade = 'C';
+  else grade = 'D';
+
+  // top spending category this month
+  const spend = {};
+  state.transactions.forEach((t) => {
+    const d = new Date(t.id);
+    if (t.type === 'expense' && d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()) {
+      spend[t.category] = (spend[t.category] || 0) + t.amount;
+    }
+  });
+  const top = Object.entries(spend).sort((a, b) => b[1] - a[1])[0];
+  const budgetResult = state.budget ? ((state.budget - expense) >= 0 ? 'UNDER ✓' : 'OVER ✗') : '—';
+
+  els.recapMonth.textContent = MONTHS[now.getMonth()] + ' ' + now.getFullYear();
+  els.recapGrade.textContent = grade;
+  els.recapGrade.className = 'recap-grade g-' + grade.toLowerCase();
+  const rows = [
+    ['▲ EARNED', fmt(income)],
+    ['▼ SPENT', fmt(expense)],
+    ['★ SAVED', fmt(net)],
+    ['SAVINGS RATE', rate + '%'],
+    ['BUDGET BOSS', budgetResult],
+    ['TOP SPEND', top ? catInfo('expense', top[0]).name + ' (' + fmt(top[1]) + ')' : '—'],
+    ['LEVEL', 'LV.' + levelFor(totals().income)],
+  ];
+  els.recapRows.innerHTML = rows.map((r) => `<div class="recap-row"><span>${r[0]}</span><span>${r[1]}</span></div>`).join('');
+  els.recapOverlay.hidden = false;
+  if (grade === 'S' || grade === 'A') { sfx.victory(); coinRain(28); }
+}
+function closeRecap() { els.recapOverlay.hidden = true; }
 
 function exportPDF() {
   sfx.click();
@@ -1082,6 +1234,9 @@ els.btnIncome.addEventListener('click', () => setType('income'));
 els.reset.addEventListener('click', resetAll);
 els.exportBtn.addEventListener('click', exportPDF);
 els.backupBtn.addEventListener('click', exportBackup);
+els.recapBtn.addEventListener('click', openRecap);
+els.recapClose.addEventListener('click', closeRecap);
+els.recapOverlay.addEventListener('click', (e) => { if (e.target === els.recapOverlay) closeRecap(); });
 els.oracleNext.addEventListener('click', () => { oracleIdx += 1; sfx.click(); typeOracle(); });
 els.chestBtn.addEventListener('click', openChest);
 
@@ -1127,8 +1282,14 @@ els.mbossList.addEventListener('click', (e) => {
 });
 
 els.list.addEventListener('click', (e) => {
-  const btn = e.target.closest('.tx-del');
-  if (btn) deleteTx(btn.dataset.id);
+  const ed = e.target.closest('.tx-edit');
+  if (ed) { startEdit(ed.dataset.id); return; }
+  const del = e.target.closest('.tx-del');
+  if (del) deleteTx(del.dataset.id);
+});
+els.recurringList.addEventListener('click', (e) => {
+  const b = e.target.closest('.r-del');
+  if (b) removeRecurring(b.dataset.id);
 });
 
 els.filters.addEventListener('click', (e) => {
@@ -1152,6 +1313,7 @@ els.mute.addEventListener('click', () => {
 ============================================================ */
 function init() {
   load();
+  const recurAdded = applyRecurring(); // auto-add any monthly entries due
   els.mute.textContent = '♪ SOUND: ' + (state.soundOn ? 'ON' : 'OFF');
   applyTheme(state.theme);
   document.body.classList.toggle('rainbow', !!state.rainbow);
@@ -1165,6 +1327,7 @@ function init() {
   }
   appReady = true; // from now on, completing a side quest celebrates
   typeOracle();    // type out the first Oracle tip for that RPG-textbox feel
+  if (recurAdded) showToast('🔁 ADDED ' + recurAdded + ' RECURRING ENTR' + (recurAdded > 1 ? 'IES' : 'Y') + ' FOR THIS MONTH');
 }
 init();
 

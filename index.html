@@ -69,6 +69,18 @@
       </div>
     </section>
 
+    <!-- ===== PIXEL KINGDOM ===== -->
+    <section class="panel kingdom-panel">
+      <div class="mini-head">
+        <h2 class="panel-title">🏰 YOUR KINGDOM</h2>
+        <span class="kingdom-label" id="kingdomLabel">CAMPSITE</span>
+      </div>
+      <div class="kingdom-scene" id="kingdomScene">
+        <span class="k-weather" id="kWeather">🌤️</span>
+        <div class="k-ground" id="kGround"></div>
+      </div>
+    </section>
+
     <!-- ===== BOSS + SAVINGS QUEST ROW ===== -->
     <section class="quest-row">
 
@@ -173,6 +185,11 @@
             </div>
           </label>
 
+          <label class="repeat-field">
+            <input type="checkbox" id="repeatInput" />
+            <span>🔁 REPEAT MONTHLY</span>
+          </label>
+
           <button type="submit" class="submit-btn" id="submitBtn">⮞ ADD ENTRY</button>
         </form>
       </section>
@@ -194,6 +211,15 @@
         </div>
       </section>
     </div>
+
+    <!-- ===== RECURRING ENTRIES ===== -->
+    <section class="panel recurring-panel">
+      <h2 class="panel-title">🔁 RECURRING</h2>
+      <div class="recurring-list" id="recurringList"></div>
+      <div class="empty-state small" id="recurringEmpty">
+        <p>NO RECURRING ENTRIES.<br />CHECK "REPEAT MONTHLY" WHEN ADDING ONE.</p>
+      </div>
+    </section>
 
     <!-- ===== CATEGORY XP BARS ===== -->
     <section class="panel cat-panel">
@@ -256,6 +282,7 @@
 
     <footer class="foot">
       <div class="foot-actions">
+        <button class="io-btn" id="recapBtn">📜 RECAP</button>
         <button class="io-btn" id="backupBtn">💾 BACKUP</button>
         <button class="io-btn" id="restoreBtn">📂 RESTORE</button>
         <button class="export-btn" id="exportBtn">⎙ EXPORT PDF</button>
@@ -268,6 +295,18 @@
 
   <!-- print-only report (filled in by exportPDF) -->
   <div class="print-report" id="printReport" aria-hidden="true"></div>
+
+  <!-- monthly recap overlay -->
+  <div class="recap-overlay" id="recapOverlay" hidden>
+    <div class="recap-card">
+      <button type="button" class="recap-close" id="recapClose">✕</button>
+      <div class="recap-head">★ LEVEL COMPLETE ★</div>
+      <div class="recap-month" id="recapMonth">MONTH</div>
+      <div class="recap-grade" id="recapGrade">A</div>
+      <div class="recap-rows" id="recapRows"></div>
+      <div class="recap-foot">SCREENSHOT TO SHARE · COIN QUEST</div>
+    </div>
+  </div>
 
   <!-- toast for level-up / coin pickups -->
   <div class="toast" id="toast" aria-live="polite"></div>
