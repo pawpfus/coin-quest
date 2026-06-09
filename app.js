@@ -502,7 +502,7 @@ const EDU_TIPS = [
   '💡 Index funds let you own a slice of hundreds of companies at once, with low fees — popular for beginners.',
   '💡 Only invest money you won\'t need for 5+ years in stocks; keep short-term savings in cash or gold.',
   '💡 Gold pays no dividends or interest — it\'s a store of value, not an income source. Balance it with assets that grow.',
-  '💡 All good until our daily caffeine spending & government boondoggle foreshadows doom.',
+  '💡 Beware lifestyle creep: like a daily caffeine habit or a government boondoggle, small recurring waste quietly compounds into doom.',
 ];
 
 function distinctMonths() {
@@ -560,7 +560,6 @@ function oracleTips() {
     if (balance <= 0) tips.push('You have no cash cushion yet. Aim for a 3–6 month emergency fund before investing.');
     else if (months < 3) tips.push('Your savings cover ~' + months.toFixed(1) + ' months of spending. Build it to 3–6 months for safety.');
     else tips.push('💪 Your savings cover ~' + Math.floor(months) + ' months of spending — a healthy emergency fund. Surplus could go into gold or stocks.');
-    else tips.push('All good until our daily caffeine spending & government boondoggle foreshadows doom.');
   }
 
   // budget adherence
