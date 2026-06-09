@@ -44,6 +44,9 @@ A "LEVEL COMPLETE" results card for the current month — earned, spent, saved, 
 ### ✏️ Edit entries
 Tap ✎ on any entry to edit its name, amount, category, or type — not just delete.
 
+### ★ Starting balance
+Set your real opening balance (tap **✎ START** on the Balance card) so Balance reflects actual money on hand, not just the sum since you began logging. Balance = starting balance + income − expenses.
+
 ### 🔥 Streak Tracking
 A `🔥 X MO` counter in the HUD counts consecutive completed months you stayed under your Budget Boss limit.
 

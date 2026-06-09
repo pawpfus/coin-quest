@@ -34,6 +34,7 @@ const CAT_COLORS = {
 /* ---------------- state ---------------- */
 let state = {
   transactions: [],
+  openingBalance: 0,    // real starting balance before any logged entries
   soundOn: true,
   musicOn: false,
   musicTrack: 0,
@@ -66,6 +67,7 @@ const els = {
   list: $('txList'), emptyState: $('emptyState'),
   catBars: $('catBars'), catEmpty: $('catEmpty'),
   filters: $('logFilters'), mute: $('muteBtn'), music: $('musicBtn'),
+  editStartBtn: $('editStartBtn'), startEditor: $('startEditor'), startInput: $('startInput'), startSave: $('startSave'),
   reset: $('resetBtn'), toast: $('toast'),
   exportBtn: $('exportBtn'), printReport: $('printReport'),
   updateBar: $('updateBar'), updateBtn: $('updateBtn'),
@@ -200,7 +202,7 @@ function totals() {
   state.transactions.forEach((t) => {
     if (t.type === 'income') income += t.amount; else expense += t.amount;
   });
-  return { income, expense, balance: income - expense };
+  return { income, expense, balance: (state.openingBalance || 0) + income - expense };
 }
 
 const prevStat = { income: 0, expense: 0, balance: 0 };
@@ -966,6 +968,22 @@ function deleteTx(id) {
   renderAll();
 }
 
+/* ---- starting balance editor ---- */
+function toggleStartEditor() {
+  const open = els.startEditor.classList.toggle('hidden') === false;
+  if (open) { els.startInput.value = state.openingBalance || ''; els.startInput.focus(); }
+  sfx.click();
+}
+function saveStart() {
+  const v = parseFloat(els.startInput.value);
+  if (Number.isNaN(v)) { sfx.error(); shake(els.startEditor); return; }
+  state.openingBalance = v;
+  save(); sfx.coin();
+  els.startEditor.classList.add('hidden');
+  showToast('★ STARTING BALANCE SET: ' + fmt(v));
+  renderAll();
+}
+
 /* ---- budget boss editor ---- */
 function toggleBudgetEditor() {
   const open = els.budgetEditor.classList.toggle('hidden') === false;
@@ -1163,6 +1181,7 @@ function importBackup(file) {
     }
     if (!confirm('RESTORE THIS BACKUP?\nIt will REPLACE your current data.')) return;
     state.transactions = data.transactions;
+    state.openingBalance = Number(data.openingBalance) || 0;
     state.budget = Number(data.budget) || 0;
     state.goal = (data.goal && data.goal.target)
       ? { name: String(data.goal.name || 'SAVINGS QUEST'), target: Number(data.goal.target) }
@@ -1326,6 +1345,10 @@ els.restoreInput.addEventListener('change', (e) => {
   if (f) importBackup(f);
   e.target.value = ''; // allow re-importing the same file
 });
+
+els.editStartBtn.addEventListener('click', toggleStartEditor);
+els.startSave.addEventListener('click', saveStart);
+els.startInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') saveStart(); });
 
 els.editBudgetBtn.addEventListener('click', toggleBudgetEditor);
 els.saveBudgetBtn.addEventListener('click', saveBudget);

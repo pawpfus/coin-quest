@@ -199,6 +199,12 @@ h1 {
   position: relative;
 }
 .stat-label { font-size: 8px; color: var(--ink-dim); letter-spacing: 1px; }
+.start-btn {
+  font-family: inherit; font-size: 6px; cursor: pointer;
+  margin-left: 4px; padding: 4px 5px; color: var(--ink-dim);
+  background: var(--bg-2); border: 2px solid var(--shadow); vertical-align: middle;
+}
+.start-btn:hover { color: var(--gold); border-color: var(--gold); }
 .stat-value { font-size: clamp(15px, 4vw, 24px); }
 .stat-foot  { font-size: 7px; color: var(--gold); letter-spacing: 1px; animation: blink 1.1s steps(2) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
