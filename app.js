@@ -1442,14 +1442,31 @@ const TRACKS = [
   { // calm/hopeful: warm major pads (C–G–Am–F), gentle rising lead
     name: 'CALM', stepMs: 300, drone: true,
     pad:  [48, 0, 0, 0, 43, 0, 0, 0, 45, 0, 0, 0, 41, 0, 0, 0],
-    lead: [0, 0, 72, 76, 0, 79, 76, 0, 0, 0, 81, 79, 0, 76, 74, 72],
+    lead: [0, 0, 72, 76, 0, 79, 76, 0, 0, 0, 81, 79, 0, 76, 74, 72], leadType: 'triangle', leadDur: 0.55,
     twinkle: [84, 88, 91, 96],
   },
   { // cozy town: bouncier mid-tempo C–Am–F–G with a friendly skipping melody
     name: 'COZY TOWN', stepMs: 220, drone: false,
     pad:  [48, 0, 0, 0, 45, 0, 0, 0, 41, 0, 0, 0, 43, 0, 0, 0],
-    lead: [76, 0, 72, 0, 74, 0, 69, 0, 72, 0, 77, 0, 74, 0, 79, 0],
+    lead: [76, 0, 72, 0, 74, 0, 69, 0, 72, 0, 77, 0, 74, 0, 79, 0], leadType: 'triangle', leadDur: 0.5,
     twinkle: [84, 88, 91],
+  },
+  { // overworld: upbeat oom-pah bass + bright bouncy square melody
+    name: 'OVERWORLD', stepMs: 175, drone: false,
+    bass: [48, 55, 48, 55, 43, 50, 43, 50, 45, 52, 45, 52, 41, 48, 41, 48], bassType: 'triangle', bassDur: 0.14, bassVol: 0.05,
+    lead: [72, 0, 76, 79, 81, 79, 76, 72, 74, 0, 77, 81, 79, 77, 74, 72], leadType: 'square', leadDur: 0.16, leadVol: 0.038,
+    twinkle: [88, 91, 96],
+  },
+  { // battle: fast driving A-minor pulse with an urgent square riff
+    name: 'BATTLE', stepMs: 145, drone: false,
+    bass: [45, 45, 45, 45, 41, 41, 41, 41, 48, 48, 48, 48, 43, 43, 43, 43], bassType: 'square', bassDur: 0.1, bassVol: 0.05,
+    lead: [69, 72, 76, 69, 72, 76, 81, 76, 77, 74, 72, 69, 71, 72, 74, 76], leadType: 'square', leadDur: 0.12, leadVol: 0.04,
+  },
+  { // victory: triumphant ascending fanfare over big chords
+    name: 'VICTORY', stepMs: 200, drone: false,
+    pad:  [48, 0, 0, 0, 41, 0, 0, 0, 43, 0, 0, 0, 48, 0, 0, 0], padDur: 1.1,
+    lead: [72, 76, 79, 84, 79, 84, 88, 0, 77, 81, 84, 89, 84, 0, 84, 0], leadType: 'square', leadDur: 0.22, leadVol: 0.05,
+    twinkle: [91, 96],
   },
 ];
 const music = { timer: null, step: 0 };
@@ -1473,15 +1490,24 @@ function musicTick() {
   const tk = curTrack();
   const i = music.step % 16;
   if (tk.drone && i === 0) mNote(N2F(36), 2.6, 'sine', 0.03);
-  const pad = tk.pad[i];
-  if (pad) {
-    mNote(N2F(pad), 1.9, 'sine', 0.05);
-    mNote(N2F(pad + 7), 1.9, 'sine', 0.03);
-    mNote(N2F(pad + 12), 1.9, 'sine', 0.018);
+  if (tk.bass) {                                   // driving staccato bass
+    const b = tk.bass[i];
+    if (b) mNote(N2F(b), tk.bassDur || 0.12, tk.bassType || 'square', tk.bassVol || 0.045);
   }
-  const m = tk.lead[i];
-  if (m) mNote(N2F(m), 0.5, 'triangle', 0.04);
-  if (Math.random() < 0.2) {
+  if (tk.pad) {                                    // sustained chord (root + fifth + octave)
+    const p = tk.pad[i];
+    if (p) {
+      const pd = tk.padDur || 1.9;
+      mNote(N2F(p), pd, 'sine', 0.05);
+      mNote(N2F(p + 7), pd, 'sine', 0.03);
+      mNote(N2F(p + 12), pd, 'sine', 0.018);
+    }
+  }
+  if (tk.lead) {
+    const m = tk.lead[i];
+    if (m) mNote(N2F(m), tk.leadDur || 0.5, tk.leadType || 'triangle', tk.leadVol || 0.04);
+  }
+  if (tk.twinkle && Math.random() < 0.2) {
     mNote(N2F(tk.twinkle[Math.floor(Math.random() * tk.twinkle.length)]), 0.32, 'sine', 0.02);
   }
   music.step += 1;
