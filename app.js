@@ -62,7 +62,9 @@ const els = {
   balance: $('balanceValue'), income: $('incomeValue'), expense: $('expenseValue'),
   balanceFoot: $('balanceFoot'), balanceCard: document.querySelector('.balance'),
   streak: $('streakDisplay'),
-  form: $('txForm'), desc: $('descInput'), amount: $('amountInput'), category: $('categoryInput'), date: $('dateInput'),
+  form: $('txForm'), desc: $('descInput'), amount: $('amountInput'), category: $('categoryInput'),
+  dateField: $('dateField'), dateLabel: $('dateLabel'),
+  calOverlay: $('calOverlay'), calPrev: $('calPrev'), calNext: $('calNext'), calTitle: $('calTitle'), calGrid: $('calGrid'), calToday: $('calToday'),
   btnExpense: $('btnExpense'), btnIncome: $('btnIncome'), submit: $('submitBtn'),
   list: $('txList'), emptyState: $('emptyState'),
   catBars: $('catBars'), catEmpty: $('catEmpty'),
@@ -159,8 +161,8 @@ function save() {
 ============================================================ */
 const fmt = (n) => {
   const neg = n < 0;
-  const v = Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-  return (neg ? '-$' : '$') + v;
+  const v = Math.abs(n).toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  return (neg ? '-Rp' : 'Rp') + v;
 };
 function catInfo(type, id) {
   return CATEGORIES[type].find((c) => c.id === id) || { name: id, icon: '❓' };
@@ -467,8 +469,9 @@ function renderStreak() {
 
 /* ---------------- WORLD MAP CHART (last 6 months) ---------------- */
 function kfmt(n) {
-  if (n >= 1000) return '$' + (n / 1000).toFixed(n % 1000 === 0 ? 0 : 1) + 'k';
-  return '$' + Math.round(n);
+  if (n >= 1000000) return 'Rp' + (n / 1000000).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + 'jt';
+  if (n >= 1000) return 'Rp' + (n / 1000).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + 'rb';
+  return 'Rp' + Math.round(n).toLocaleString('id-ID');
 }
 function renderChart() {
   const now = new Date();
@@ -913,7 +916,42 @@ function setType(type) {
 }
 
 function submitLabel() { return currentType === 'income' ? '⮞ COLLECT GOLD' : '⮞ ADD ENTRY'; }
-function setDateToday() { els.date.value = tsToYmd(Date.now()); }
+
+/* ---- custom date picker ---- */
+let pickerDate = Date.now();          // the date chosen for the form
+let calView = { y: 0, m: 0 };         // month currently shown in the popup
+function fmtDateLabel(ts) {
+  return new Date(ts).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
+}
+function setPickerDate(ts) { pickerDate = ts; els.dateLabel.textContent = fmtDateLabel(ts); }
+function setDateToday() { setPickerDate(Date.now()); }
+function renderCal() {
+  els.calTitle.textContent = MONTHS[calView.m] + ' ' + calView.y;
+  const daysIn = new Date(calView.y, calView.m + 1, 0).getDate();
+  const firstDow = new Date(calView.y, calView.m, 1).getDay();
+  const sel = new Date(pickerDate), now = new Date();
+  let html = '';
+  for (let i = 0; i < firstDow; i++) html += '<span class="cal-cell blank"></span>';
+  for (let d = 1; d <= daysIn; d++) {
+    const isSel = sel.getFullYear() === calView.y && sel.getMonth() === calView.m && sel.getDate() === d;
+    const isToday = now.getFullYear() === calView.y && now.getMonth() === calView.m && now.getDate() === d;
+    html += `<button type="button" class="cal-cell${isSel ? ' sel' : ''}${isToday ? ' today' : ''}" data-d="${d}">${d}</button>`;
+  }
+  els.calGrid.innerHTML = html;
+}
+function openCal() {
+  const d = new Date(pickerDate);
+  calView = { y: d.getFullYear(), m: d.getMonth() };
+  renderCal();
+  els.calOverlay.hidden = false;
+  sfx.click();
+}
+function shiftCal(delta) {
+  calView.m += delta;
+  if (calView.m < 0) { calView.m = 11; calView.y -= 1; }
+  else if (calView.m > 11) { calView.m = 0; calView.y += 1; }
+  renderCal();
+}
 
 function startEdit(id) {
   const tx = state.transactions.find((t) => t.id === Number(id));
@@ -923,7 +961,7 @@ function startEdit(id) {
   els.desc.value = tx.desc;
   els.amount.value = tx.amount;
   els.category.value = tx.category;
-  els.date.value = tsToYmd(txDate(tx));
+  setPickerDate(txDate(tx));
   els.submit.textContent = '✓ SAVE EDIT';
   els.form.scrollIntoView({ behavior: 'smooth', block: 'center' });
   els.desc.focus();
@@ -938,7 +976,7 @@ function addTx(e) {
   // edit mode: update the existing entry and exit
   if (editingId != null) {
     const tx = state.transactions.find((t) => t.id === editingId);
-    if (tx) { tx.type = currentType; tx.desc = desc; tx.amount = amount; tx.category = els.category.value; tx.date = ymdToTs(els.date.value); }
+    if (tx) { tx.type = currentType; tx.desc = desc; tx.amount = amount; tx.category = els.category.value; tx.date = pickerDate; }
     editingId = null;
     save(); sfx.click();
     renderAll();
@@ -952,7 +990,7 @@ function addTx(e) {
 
   state.transactions.push({
     id: Date.now(),
-    date: ymdToTs(els.date.value),
+    date: pickerDate,
     type: currentType,
     desc,
     amount,
@@ -1360,6 +1398,20 @@ els.restoreInput.addEventListener('change', (e) => {
 els.editStartBtn.addEventListener('click', toggleStartEditor);
 els.startSave.addEventListener('click', saveStart);
 els.startInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') saveStart(); });
+
+// custom date picker
+els.dateField.addEventListener('click', openCal);
+els.calPrev.addEventListener('click', () => shiftCal(-1));
+els.calNext.addEventListener('click', () => shiftCal(1));
+els.calToday.addEventListener('click', () => { setPickerDate(Date.now()); sfx.click(); els.calOverlay.hidden = true; });
+els.calGrid.addEventListener('click', (e) => {
+  const cell = e.target.closest('.cal-cell[data-d]');
+  if (!cell) return;
+  setPickerDate(new Date(calView.y, calView.m, Number(cell.dataset.d), 12).getTime());
+  sfx.click();
+  els.calOverlay.hidden = true;
+});
+els.calOverlay.addEventListener('click', (e) => { if (e.target === els.calOverlay) els.calOverlay.hidden = true; });
 
 els.editBudgetBtn.addEventListener('click', toggleBudgetEditor);
 els.saveBudgetBtn.addEventListener('click', saveBudget);

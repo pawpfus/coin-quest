@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="styles.css?v=57" />
+<link rel="stylesheet" href="styles.css?v=58" />
 </head>
 <body>
   <!-- update banner (shown when a new version is deployed) -->
@@ -55,22 +55,23 @@
     <!-- ===== STAT HUD ===== -->
     <section class="stats" aria-label="Money stats">
       <div class="stat-card balance">
-        <span class="stat-label">★ BALANCE <button type="button" class="start-btn" id="editStartBtn" title="Set starting balance">✎ START</button></span>
-        <span class="stat-value" id="balanceValue">$0</span>
+        <button type="button" class="corner-btn" id="editStartBtn" title="Set starting balance">SET ✎</button>
+        <span class="stat-label">★ BALANCE</span>
+        <span class="stat-value" id="balanceValue">Rp0</span>
         <span class="stat-foot" id="balanceFoot">PRESS START</span>
         <div class="editor hidden" id="startEditor">
-          <span class="dollar2">$</span>
+          <span class="dollar2">Rp</span>
           <input type="number" id="startInput" step="1" placeholder="STARTING BALANCE" />
           <button type="button" class="mini-save" id="startSave">OK</button>
         </div>
       </div>
       <div class="stat-card income">
         <span class="stat-label">▲ INCOME</span>
-        <span class="stat-value" id="incomeValue">$0</span>
+        <span class="stat-value" id="incomeValue">Rp0</span>
       </div>
       <div class="stat-card expense">
         <span class="stat-label">▼ SPENT</span>
-        <span class="stat-value" id="expenseValue">$0</span>
+        <span class="stat-value" id="expenseValue">Rp0</span>
       </div>
     </section>
 
@@ -96,7 +97,7 @@
         </div>
 
         <div class="editor hidden" id="budgetEditor">
-          <span class="dollar2">$</span>
+          <span class="dollar2">Rp</span>
           <input type="number" id="budgetInput" min="1" step="1" placeholder="MONTHLY LIMIT" />
           <button type="button" class="mini-save" id="saveBudgetBtn">OK</button>
           <button type="button" class="mini-clear" id="clearBudgetBtn">CLEAR</button>
@@ -123,7 +124,7 @@
 
         <div class="editor hidden" id="goalEditor">
           <input type="text" id="goalNameInput" maxlength="18" placeholder="QUEST NAME" />
-          <span class="dollar2">$</span>
+          <span class="dollar2">Rp</span>
           <input type="number" id="goalTargetInput" min="1" step="1" placeholder="TARGET" />
           <button type="button" class="mini-save" id="saveGoalBtn">OK</button>
           <button type="button" class="mini-clear" id="clearGoalBtn">CLEAR</button>
@@ -141,7 +142,7 @@
       </div>
       <div class="editor mboss-editor" id="catBudgetEditor">
         <div class="select-wrap mboss-select"><select id="catBudgetSelect"></select></div>
-        <span class="dollar2">$</span>
+        <span class="dollar2">Rp</span>
         <input type="number" id="catBudgetInput" min="1" step="1" placeholder="LIMIT" />
         <button type="button" class="mini-save" id="catBudgetSave">SET</button>
       </div>
@@ -166,7 +167,7 @@
           <label class="field">
             <span class="field-label">GOLD AMOUNT</span>
             <div class="amount-wrap">
-              <span class="dollar">$</span>
+              <span class="dollar">Rp</span>
               <input type="number" id="amountInput" min="0.01" step="0.01" placeholder="0.00" required />
             </div>
           </label>
@@ -180,7 +181,7 @@
 
           <label class="field">
             <span class="field-label">DATE</span>
-            <input type="date" id="dateInput" />
+            <button type="button" class="date-field" id="dateField"><span id="dateLabel">—</span><span class="df-ico">📅</span></button>
           </label>
 
           <button type="submit" class="submit-btn" id="submitBtn">⮞ ADD ENTRY</button>
@@ -281,6 +282,20 @@
   <!-- print-only report (filled in by exportPDF) -->
   <div class="print-report" id="printReport" aria-hidden="true"></div>
 
+  <!-- custom date picker overlay -->
+  <div class="cal-overlay" id="calOverlay" hidden>
+    <div class="cal-card">
+      <div class="cal-head">
+        <button type="button" class="cal-nav" id="calPrev">◀</button>
+        <span class="cal-title" id="calTitle">MONTH</span>
+        <button type="button" class="cal-nav" id="calNext">▶</button>
+      </div>
+      <div class="cal-weekdays"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+      <div class="cal-grid" id="calGrid"></div>
+      <button type="button" class="cal-today" id="calToday">↺ TODAY</button>
+    </div>
+  </div>
+
   <!-- monthly recap overlay -->
   <div class="recap-overlay" id="recapOverlay" hidden>
     <div class="recap-card">
@@ -296,6 +311,6 @@
   <!-- toast for level-up / coin pickups -->
   <div class="toast" id="toast" aria-live="polite"></div>
 
-  <script src="app.js?v=57"></script>
+  <script src="app.js?v=58"></script>
 </body>
 </html>
