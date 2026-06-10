@@ -53,7 +53,6 @@ let state = {
 let appReady = false;   // true after init, so quests don't celebrate on load
 let currentType = 'expense';
 let currentFilter = 'all';      // type filter: all / income / expense
-let searchTerm = '';            // quest-log name search
 let catFilterVal = 'all';       // quest-log category filter
 let monthFilterVal = 'all';     // quest-log month filter (y*12+m, or 'all')
 let editingId = null; // id of the transaction being edited (null = adding new)
@@ -70,7 +69,7 @@ const els = {
   calOverlay: $('calOverlay'), calPrev: $('calPrev'), calNext: $('calNext'), calTitle: $('calTitle'), calGrid: $('calGrid'), calToday: $('calToday'),
   btnExpense: $('btnExpense'), btnIncome: $('btnIncome'), submit: $('submitBtn'),
   list: $('txList'), emptyState: $('emptyState'),
-  searchInput: $('searchInput'), catFilter: $('catFilter'), monthFilter: $('monthFilter'), logSummary: $('logSummary'),
+  catFilter: $('catFilter'), monthFilter: $('monthFilter'), logSummary: $('logSummary'),
   catBars: $('catBars'), catEmpty: $('catEmpty'),
   filters: $('logFilters'), mute: $('muteBtn'), music: $('musicBtn'),
   editStartBtn: $('editStartBtn'), startEditor: $('startEditor'), startInput: $('startInput'), startSave: $('startSave'),
@@ -261,7 +260,6 @@ function matchesFilters(t) {
   if (currentFilter !== 'all' && t.type !== currentFilter) return false;
   if (catFilterVal !== 'all' && t.category !== catFilterVal) return false;
   if (monthFilterVal !== 'all' && txMonthKey(t) !== Number(monthFilterVal)) return false;
-  if (searchTerm && !t.desc.toLowerCase().includes(searchTerm)) return false;
   return true;
 }
 
@@ -278,7 +276,7 @@ function renderList() {
   let inc = 0, exp = 0;
   items.forEach((t) => { if (t.type === 'income') inc += t.amount; else exp += t.amount; });
   const net = inc - exp;
-  const anyFilter = currentFilter !== 'all' || catFilterVal !== 'all' || monthFilterVal !== 'all' || !!searchTerm;
+  const anyFilter = currentFilter !== 'all' || catFilterVal !== 'all' || monthFilterVal !== 'all';
   els.logSummary.innerHTML = state.transactions.length
     ? `${items.length} ${anyFilter ? 'MATCH' : 'ENTR' + (items.length === 1 ? 'Y' : 'IES')} · <span class="sum-net ${net >= 0 ? 'pos' : 'neg'}">${net >= 0 ? '+' : ''}${fmt(net)}</span>`
     : '';
@@ -1488,7 +1486,6 @@ els.filters.addEventListener('click', (e) => {
   sfx.click();
   renderList();
 });
-els.searchInput.addEventListener('input', () => { searchTerm = els.searchInput.value.trim().toLowerCase(); renderList(); });
 els.catFilter.addEventListener('change', () => { catFilterVal = els.catFilter.value; sfx.click(); renderList(); });
 els.monthFilter.addEventListener('change', () => { monthFilterVal = els.monthFilter.value; sfx.click(); renderList(); });
 
