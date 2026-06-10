@@ -562,6 +562,15 @@ select { -webkit-appearance: none; appearance: none; cursor: pointer; }
 }
 .filter-btn.active { color: var(--gold); border-color: var(--gold); }
 
+/* search + filter bar */
+.log-search { display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 10px; }
+.log-search input { font-size: 9px; padding: 10px 9px; }
+.log-search .select-wrap select { font-size: 8px; padding: 9px 8px; }
+.log-search-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.log-summary { font-size: 8px; color: var(--ink-dim); margin-bottom: 10px; letter-spacing: 1px; min-height: 12px; }
+.log-summary .sum-net.pos { color: var(--green); }
+.log-summary .sum-net.neg { color: var(--red); }
+
 .tx-list { list-style: none; max-height: 360px; overflow-y: auto; padding-right: 4px; }
 .tx-list::-webkit-scrollbar { width: 10px; }
 .tx-list::-webkit-scrollbar-track { background: var(--bg-2); }

@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="styles.css?v=58" />
+<link rel="stylesheet" href="styles.css?v=59" />
 </head>
 <body>
   <!-- update banner (shown when a new version is deployed) -->
@@ -198,6 +198,14 @@
             <button class="filter-btn" data-filter="expense">SPEND</button>
           </div>
         </div>
+        <div class="log-search">
+          <input type="text" id="searchInput" placeholder="🔎 SEARCH NAME…" autocomplete="off" />
+          <div class="log-search-row">
+            <div class="select-wrap"><select id="catFilter"></select></div>
+            <div class="select-wrap"><select id="monthFilter"></select></div>
+          </div>
+        </div>
+        <div class="log-summary" id="logSummary"></div>
         <ul class="tx-list" id="txList"></ul>
         <div class="empty-state" id="emptyState">
           <span class="empty-art">[ · _ · ]</span>
@@ -311,6 +319,6 @@
   <!-- toast for level-up / coin pickups -->
   <div class="toast" id="toast" aria-live="polite"></div>
 
-  <script src="app.js?v=58"></script>
+  <script src="app.js?v=59"></script>
 </body>
 </html>

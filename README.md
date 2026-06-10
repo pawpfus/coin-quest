@@ -41,6 +41,9 @@ Set a named savings goal and watch a golden treasure bar fill toward it:
 ### 📜 Monthly Recap
 A "LEVEL COMPLETE" results card for the current month — earned, spent, saved, savings-rate grade (S/A/B/C/D), budget result, and top category — styled to screenshot and share.
 
+### 🔎 Search & filter the log
+Search entries by name, filter by category and by month, and see a live count + net total of whatever's shown — so you can answer "how much did I spend on Food in April?" at a glance.
+
 ### ✏️ Edit entries & 🗓️ backdate
 Tap ✎ on any entry to edit its name, amount, category, type, or **date**. Every entry has a date field (defaults to today) so you can **backdate** old transactions — the Quest Log, monthly streak, World Map history, and all trends use the entry's real date.
 

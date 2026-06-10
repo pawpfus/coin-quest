@@ -52,7 +52,10 @@ let state = {
 };
 let appReady = false;   // true after init, so quests don't celebrate on load
 let currentType = 'expense';
-let currentFilter = 'all';
+let currentFilter = 'all';      // type filter: all / income / expense
+let searchTerm = '';            // quest-log name search
+let catFilterVal = 'all';       // quest-log category filter
+let monthFilterVal = 'all';     // quest-log month filter (y*12+m, or 'all')
 let editingId = null; // id of the transaction being edited (null = adding new)
 let scatterBuddies = () => {}; // assigned by the roaming-buddies system below
 
@@ -67,6 +70,7 @@ const els = {
   calOverlay: $('calOverlay'), calPrev: $('calPrev'), calNext: $('calNext'), calTitle: $('calTitle'), calGrid: $('calGrid'), calToday: $('calToday'),
   btnExpense: $('btnExpense'), btnIncome: $('btnIncome'), submit: $('submitBtn'),
   list: $('txList'), emptyState: $('emptyState'),
+  searchInput: $('searchInput'), catFilter: $('catFilter'), monthFilter: $('monthFilter'), logSummary: $('logSummary'),
   catBars: $('catBars'), catEmpty: $('catEmpty'),
   filters: $('logFilters'), mute: $('muteBtn'), music: $('musicBtn'),
   editStartBtn: $('editStartBtn'), startEditor: $('startEditor'), startInput: $('startInput'), startSave: $('startSave'),
@@ -252,13 +256,32 @@ function renderStats(prevLevel) {
   }
 }
 
+function txMonthKey(t) { const d = new Date(txDate(t)); return d.getFullYear() * 12 + d.getMonth(); }
+function matchesFilters(t) {
+  if (currentFilter !== 'all' && t.type !== currentFilter) return false;
+  if (catFilterVal !== 'all' && t.category !== catFilterVal) return false;
+  if (monthFilterVal !== 'all' && txMonthKey(t) !== Number(monthFilterVal)) return false;
+  if (searchTerm && !t.desc.toLowerCase().includes(searchTerm)) return false;
+  return true;
+}
+
 function renderList() {
+  fillMonthFilter();
   const items = state.transactions
-    .filter((t) => currentFilter === 'all' || t.type === currentFilter)
+    .filter(matchesFilters)
     .slice().sort((a, b) => txDate(b) - txDate(a)); // newest date first (handles backdated entries)
 
   els.list.innerHTML = '';
   els.emptyState.style.display = items.length ? 'none' : 'block';
+
+  // filtered summary: count + net (income − expense of shown)
+  let inc = 0, exp = 0;
+  items.forEach((t) => { if (t.type === 'income') inc += t.amount; else exp += t.amount; });
+  const net = inc - exp;
+  const anyFilter = currentFilter !== 'all' || catFilterVal !== 'all' || monthFilterVal !== 'all' || !!searchTerm;
+  els.logSummary.innerHTML = state.transactions.length
+    ? `${items.length} ${anyFilter ? 'MATCH' : 'ENTR' + (items.length === 1 ? 'Y' : 'IES')} · <span class="sum-net ${net >= 0 ? 'pos' : 'neg'}">${net >= 0 ? '+' : ''}${fmt(net)}</span>`
+    : '';
 
   items.forEach((t) => {
     const c = catInfo(t.type, t.category);
@@ -279,6 +302,26 @@ function renderList() {
     `;
     els.list.appendChild(li);
   });
+}
+
+function fillCatFilter() {
+  const seen = new Set();
+  const opts = ['<option value="all">ALL CATEGORIES</option>'];
+  [...CATEGORIES.expense, ...CATEGORIES.income].forEach((c) => {
+    if (seen.has(c.id)) return; seen.add(c.id);
+    opts.push(`<option value="${c.id}">${c.icon} ${c.name}</option>`);
+  });
+  els.catFilter.innerHTML = opts.join('');
+}
+function fillMonthFilter() {
+  const keys = new Set();
+  state.transactions.forEach((t) => keys.add(txMonthKey(t)));
+  const sorted = [...keys].sort((a, b) => b - a);
+  const opts = ['<option value="all">ALL MONTHS</option>'];
+  sorted.forEach((k) => { opts.push(`<option value="${k}">${MONTHS[k % 12]} ${Math.floor(k / 12)}</option>`); });
+  els.monthFilter.innerHTML = opts.join('');
+  if (monthFilterVal !== 'all' && !keys.has(Number(monthFilterVal))) monthFilterVal = 'all';
+  els.monthFilter.value = monthFilterVal;
 }
 
 function renderCats() {
@@ -1445,6 +1488,9 @@ els.filters.addEventListener('click', (e) => {
   sfx.click();
   renderList();
 });
+els.searchInput.addEventListener('input', () => { searchTerm = els.searchInput.value.trim().toLowerCase(); renderList(); });
+els.catFilter.addEventListener('change', () => { catFilterVal = els.catFilter.value; sfx.click(); renderList(); });
+els.monthFilter.addEventListener('change', () => { monthFilterVal = els.monthFilter.value; sfx.click(); renderList(); });
 
 els.mute.addEventListener('click', () => {
   state.soundOn = !state.soundOn;
@@ -1463,6 +1509,7 @@ function init() {
   document.body.classList.toggle('rainbow', !!state.rainbow);
   fillCategories();
   fillCatBudgetSelect();
+  fillCatFilter();
   setDateToday();
   renderAll();
 
