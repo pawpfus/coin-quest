@@ -206,7 +206,12 @@ h1 {
   background: var(--bg-2); border: 2px solid var(--shadow);
 }
 .corner-btn:hover { color: var(--gold); border-color: var(--gold); }
-.stat-value { font-size: clamp(15px, 4vw, 24px); }
+.stat-value { font-size: clamp(15px, 4vw, 24px); white-space: nowrap; }
+/* auto-shrink as the Rupiah figure grows longer (set by fitStat in JS) */
+.stat-value.len-m   { font-size: clamp(13px, 3.4vw, 20px); }
+.stat-value.len-l   { font-size: clamp(12px, 3vw, 17px); }
+.stat-value.len-xl  { font-size: clamp(10px, 2.6vw, 14px); }
+.stat-value.len-xxl { font-size: clamp(9px, 2.2vw, 11px); }
 .stat-foot  { font-size: 7px; color: var(--gold); letter-spacing: 1px; animation: blink 1.1s steps(2) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
 

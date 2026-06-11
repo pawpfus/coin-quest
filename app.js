@@ -217,13 +217,22 @@ function totals() {
 }
 
 const prevStat = { income: 0, expense: 0, balance: 0 };
+// shrink the stat font as the Rupiah figure grows (lots of zeros = long string)
+function fitStat(el, a, b) {
+  const len = Math.max(fmt(a).length, fmt(b).length);
+  el.classList.remove('len-m', 'len-l', 'len-xl', 'len-xxl');
+  if (len >= 17) el.classList.add('len-xxl');
+  else if (len >= 14) el.classList.add('len-xl');
+  else if (len >= 12) el.classList.add('len-l');
+  else if (len >= 10) el.classList.add('len-m');
+}
 function animateValue(el, from, to, dur = 650) {
   if (from === to) { el.textContent = fmt(to); return; }
   const start = performance.now();
   function frame(t) {
     const k = Math.min(1, (t - start) / dur);
     const eased = 1 - Math.pow(1 - k, 3);
-    el.textContent = fmt(from + (to - from) * eased);
+    el.textContent = fmt(Math.round(from + (to - from) * eased));
     if (k < 1) requestAnimationFrame(frame); else el.textContent = fmt(to);
   }
   requestAnimationFrame(frame);
@@ -231,6 +240,9 @@ function animateValue(el, from, to, dur = 650) {
 
 function renderStats(prevLevel) {
   const { income, expense, balance } = totals();
+  fitStat(els.income, prevStat.income, income);
+  fitStat(els.expense, prevStat.expense, expense);
+  fitStat(els.balance, prevStat.balance, balance);
   animateValue(els.income, prevStat.income, income);  prevStat.income = income;
   animateValue(els.expense, prevStat.expense, expense); prevStat.expense = expense;
   animateValue(els.balance, prevStat.balance, balance); prevStat.balance = balance;
