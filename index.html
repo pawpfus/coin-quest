@@ -58,8 +58,10 @@
     <!-- ===== STAT HUD ===== -->
     <section class="stats" aria-label="Money stats">
       <div class="stat-card balance">
-        <span class="stat-label">★ BALANCE <button type="button" class="start-btn" id="editStartBtn"
-            title="Set starting balance">✎ START</button></span>
+        <div class="mini-head">
+          <span class="stat-label">★ BALANCE</span>
+          <button type="button" class="mini-btn" id="editStartBtn" title="Set starting balance">SET ✎</button>
+        </div>
         <span class="stat-value" id="balanceValue">$0</span>
         <span class="stat-foot" id="balanceFoot">PRESS START</span>
         <div class="editor hidden" id="startEditor">
