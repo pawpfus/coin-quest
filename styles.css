@@ -31,6 +31,14 @@
   margin: 0;
   padding: 0;
   -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+/* Remove blue/purple tap highlight & focus outline on mobile for all interactive elements */
+a, button, input, select, textarea, label, [role="button"], [tabindex] {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  outline: none;
+  -webkit-touch-callout: none;
 }
 
 /* background lives on <html> so the fixed starfield canvas (z-index:-1)
