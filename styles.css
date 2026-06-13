@@ -273,6 +273,8 @@ h1 {
   flex-direction: column;
   gap: 10px;
   position: relative;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .stat-label {
@@ -284,23 +286,25 @@ h1 {
 .stat-value {
   font-size: clamp(15px, 4vw, 24px);
   white-space: nowrap;
+  max-width: 100%;
 }
 
-/* auto-shrink as the Rupiah figure grows longer (set by fitStat in JS) */
+/* auto-shrink as the Rupiah figure grows longer (set by fitStat in JS).
+   max caps are tuned so even billions never spill past the card border. */
 .stat-value.len-m {
-  font-size: clamp(13px, 3.4vw, 20px);
+  font-size: clamp(12px, 3vw, 18px);
 }
 
 .stat-value.len-l {
-  font-size: clamp(12px, 3vw, 17px);
+  font-size: clamp(11px, 2.6vw, 15px);
 }
 
 .stat-value.len-xl {
-  font-size: clamp(10px, 2.6vw, 14px);
+  font-size: clamp(10px, 2.2vw, 13px);
 }
 
 .stat-value.len-xxl {
-  font-size: clamp(9px, 2.2vw, 11px);
+  font-size: clamp(9px, 1.9vw, 11px);
 }
 
 .stat-foot {
@@ -407,6 +411,13 @@ h1 {
   display: grid;
   place-items: center;
   filter: drop-shadow(3px 3px 0 var(--shadow));
+  cursor: pointer;            /* pokeable — see app.js */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.logo-octo {
+  cursor: pointer;
 }
 
 .boss-sprite {
@@ -533,15 +544,26 @@ h1 {
   letter-spacing: 1px;
 }
 
-/* the HP / XP bar shell */
+/* the HP / XP bar shell — a recessed glass capsule */
 .hpbar-track {
   display: block;
   height: 20px;
-  background: var(--bg-2);
+  background: linear-gradient(180deg, #0a0a1a, #16162f);
   border: 3px solid var(--shadow);
   position: relative;
   overflow: hidden;
-  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, .5);
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, .6), inset -2px -2px 0 rgba(255, 255, 255, .05);
+}
+
+/* segmented "HP pip" dividers painted over the fill for that arcade look */
+.hpbar-track::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(90deg,
+      rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, 0) 10px,
+      rgba(0, 0, 0, .5) 10px, rgba(0, 0, 0, .5) 12px);
 }
 
 .hpbar-fill,
@@ -549,31 +571,45 @@ h1 {
   display: block;
   height: 100%;
   width: 0;
-  box-shadow: inset 0 3px 0 rgba(255, 255, 255, .3), inset 0 -3px 0 rgba(0, 0, 0, .25);
-  transition: width .55s cubic-bezier(.18, .89, .32, 1.28), background-color .3s;
+  position: relative;
+  box-shadow: inset 0 3px 0 rgba(255, 255, 255, .35), inset 0 -4px 0 rgba(0, 0, 0, .3);
+  transition: width .55s cubic-bezier(.18, .89, .32, 1.28), background-color .3s, background-image .3s;
 }
 
-/* HP color states (set via class on fill) */
+/* glassy top sheen on every fill */
+.hpbar-fill::after,
+.xpbar-fill::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 45%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .5), rgba(255, 255, 255, 0));
+  pointer-events: none;
+}
+
+/* HP color states (set via class on fill) — gradients give the bar volume */
 .hpbar-fill.hp-ok {
-  background-color: var(--green);
+  background-image: linear-gradient(180deg, #7cff6b, #1f9d3a);
 }
 
 .hpbar-fill.hp-warn {
-  background-color: var(--gold);
+  background-image: linear-gradient(180deg, #ffe98a, #e0a300);
 }
 
 .hpbar-fill.hp-danger {
-  background-color: var(--red);
+  background-image: linear-gradient(180deg, #ff8181, #c01616);
   animation: blink 0.6s steps(2) infinite;
 }
 
 .hpbar-fill.hp-dead {
-  background-color: var(--red);
+  background-image: linear-gradient(180deg, #ff8181, #b01010);
 }
 
-/* savings XP bar — golden treasure gradient */
+/* savings XP bar — golden treasure gradient that streams */
 .xpbar-fill {
-  background-image: linear-gradient(90deg, var(--gold-dk), var(--gold));
+  background-image: linear-gradient(90deg, var(--gold-dk), var(--gold), var(--gold-dk));
   background-size: 200% 100%;
   animation: flow 2.5s linear infinite;
 }
@@ -684,17 +720,32 @@ h1 {
 .mboss-bar-track {
   display: block;
   height: 14px;
-  background: var(--bg-2);
+  background: linear-gradient(180deg, #0a0a1a, #16162f);
   border: 3px solid var(--shadow);
+  position: relative;
   overflow: hidden;
-  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, .5);
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, .6);
+}
+
+/* segmented pips, matching the boss bars */
+.mboss-bar-track::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(90deg,
+      rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, 0) 8px,
+      rgba(0, 0, 0, .5) 8px, rgba(0, 0, 0, .5) 10px);
 }
 
 .mboss-bar-fill {
   display: block;
   height: 100%;
   width: 0;
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, .3);
+  position: relative;
+  /* overlays the inline background-color set in JS for a 3-D sheen */
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0) 45%, rgba(0, 0, 0, .28));
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, .35), inset 0 -3px 0 rgba(0, 0, 0, .3);
   transition: width .55s cubic-bezier(.18, .89, .32, 1.28), background-color .3s;
 }
 
@@ -1288,6 +1339,12 @@ select {
 
 .tx-amount.expense {
   color: var(--red);
+}
+
+.tx-actions {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
 }
 
 .tx-del,
@@ -2444,6 +2501,27 @@ body[data-theme="midas"] {
   .cat-row {
     grid-template-columns: 86px 1fr 60px;
   }
+
+  /* QUEST LOG: a tidy 2-row card so entries stop crowding on narrow screens.
+     row 1: icon | description | amount      row 2: icon | category·date | edit/del */
+  .tx-item {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+    grid-template-areas:
+      "icon desc   amount"
+      "icon meta   actions";
+    column-gap: 10px;
+    row-gap: 5px;
+    padding: 10px 10px;
+  }
+
+  .tx-icon   { grid-area: icon; width: 30px; height: 30px; align-self: center; }
+  .tx-body   { display: contents; }      /* let desc + meta drop onto the grid */
+  .tx-desc   { grid-area: desc; align-self: end; }
+  .tx-meta   { grid-area: meta; margin-top: 0; align-self: start; }
+  .tx-amount { grid-area: amount; align-self: end; text-align: right; }
+  .tx-actions { grid-area: actions; align-self: start; justify-content: flex-end; }
+  .tx-del, .tx-edit { font-size: 12px; padding: 2px 5px; }
 
   /* skins: one compact inline row that fits without scrolling (swatches only) */
   .theme-grid {

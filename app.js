@@ -223,10 +223,10 @@ const prevStat = { income: 0, expense: 0, balance: 0 };
 function fitStat(el, a, b) {
   const len = Math.max(fmt(a).length, fmt(b).length);
   el.classList.remove('len-m', 'len-l', 'len-xl', 'len-xxl');
-  if (len >= 17) el.classList.add('len-xxl');
-  else if (len >= 14) el.classList.add('len-xl');
-  else if (len >= 12) el.classList.add('len-l');
-  else if (len >= 10) el.classList.add('len-m');
+  if (len >= 14) el.classList.add('len-xxl');        // Rp1.000.000.000+
+  else if (len >= 12) el.classList.add('len-xl');     // Rp100.000.000+
+  else if (len >= 10) el.classList.add('len-l');      // Rp1.000.000+
+  else if (len >= 8) el.classList.add('len-m');       // Rp10.000+
 }
 function animateValue(el, from, to, dur = 650) {
   if (from === to) { el.textContent = fmt(to); return; }
@@ -310,8 +310,10 @@ function renderList() {
         <span class="tx-meta">${c.name} · ${date}</span>
       </span>
       <span class="tx-amount ${t.type}">${t.type === 'income' ? '+' : '-'}${fmt(t.amount).replace('-','')}</span>
-      <button class="tx-edit" title="Edit" data-id="${t.id}">✎</button>
-      <button class="tx-del" title="Delete" data-id="${t.id}">✕</button>
+      <span class="tx-actions">
+        <button class="tx-edit" title="Edit" data-id="${t.id}">✎</button>
+        <button class="tx-del" title="Delete" data-id="${t.id}">✕</button>
+      </span>
     `;
     els.list.appendChild(li);
   });
@@ -1519,6 +1521,30 @@ els.optToggle.addEventListener('click', () => {
   if (opening) beep([392, 523], 0.05, 'square', 0.04); else sfx.click();
 });
 els.chestBtn.addEventListener('click', openChest);
+
+/* ---- pokeable sprites: little reactive easter-eggs for extra game feel ---- */
+function wiggle(el) {
+  if (!el) return;
+  el.animate(
+    [{ transform: 'rotate(0) scale(1)' }, { transform: 'rotate(-12deg) scale(1.2)' },
+     { transform: 'rotate(12deg) scale(1.2)' }, { transform: 'rotate(0) scale(1)' }],
+    { duration: 360, easing: 'ease-in-out' }
+  );
+}
+// poke the Budget Boss → it flinches and growls
+els.bossSprite.addEventListener('click', () => {
+  wiggle(els.bossSprite);
+  if (state.budget) { sfx.roar(); } else { sfx.click(); }
+  vibe(12);
+});
+// poke the Savings chest → a hopeful little jingle + sparkle
+els.goalChest.addEventListener('click', () => {
+  wiggle(els.goalChest);
+  beep([784, 1047, 1319], 0.06, 'square', 0.05); vibe(10);
+});
+// poke the title mascot → friendly blip
+const logoOcto = document.getElementById('logoOcto');
+if (logoOcto) logoOcto.addEventListener('click', () => { wiggle(logoOcto); sfx.coin(); });
 
 // Konami code (keyboard) → rainbow cheat
 const KONAMI = ['arrowup', 'arrowup', 'arrowdown', 'arrowdown', 'arrowleft', 'arrowright', 'arrowleft', 'arrowright', 'b', 'a'];
