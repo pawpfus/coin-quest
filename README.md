@@ -15,8 +15,8 @@ A fully client-side personal finance tracker with a retro Nintendo 8-bit theme. 
 - **Spending Map** — animated XP-style bars showing where your money goes
 - **Leveling + XP bar** — gain a level for every $1,000 earned, with a live XP bar filling toward the next level and a level-up jingle
 
-### 🗺️ Side Quests
-A panel of auto-tracked challenges (log 5 entries, spend in 3 categories, reach a $5,000 balance, hit a 3-month budget streak, complete a savings quest, and more). Each shows live progress and fires a celebration when you complete it.
+### 🗺️ Side Quests (Deeds)
+A set of auto-tracked challenges (log 5 entries, spend in 3 categories, reach a $5,000 balance, hit a 3-month budget streak, complete a savings quest, and more). Each shows live progress and fires a celebration when you complete it. They live behind a collapsible **📜 DEEDS** toggle on the Quest Board (with a live done/total count) so the board stays tidy. Completing *every* deed unlocks the secret MIDAS skin and the final COSMOS zone.
 
 ### 🎲 Random encounters
 Logging an entry has a small chance to trigger a pixel event — a wandering merchant, a found coin, a goblin pickpocket — for a bit of dungeon-crawl surprise.
@@ -90,7 +90,7 @@ Pac-Man and the four ghosts (drawn as crisp SVG sprites) drift and bounce freely
 Looping 8-bit tracks generated live with the Web Audio API (no audio files) — **one original theme per skin, locked behind that skin**. The MUSIC button cycles OFF → Classic → Game Boy → SNES → Arcade → Mushroom → Jungle → Midas, **skipping any track whose skin you haven't unlocked yet** (Classic is always free). Every track is an original chiptune tune written to match its skin's mood (heroic NES march, lo-fi handheld, lush 16-bit pads, neon arcade pulse, platformer romp, tribal-jungle groove, regal golden fanfare), and selecting any unlocked skin auto-plays its theme while music is on.
 
 ### 🗺️ World zones
-Your net worth is a journey across biomes. As your balance grows you advance through **GREEN MEADOW → WHISPER WOODS → CRYSTAL CAVE → GOLDEN DUNES → FROZEN PEAK → THE COSMOS**, each repainting the pixel horizon behind the app, with a live progress bar to the next zone in the header. The zone tiers are **synced to the skin unlocks** — hitting a net-worth milestone unlocks a skin, its zone, and its theme music together — so progression is one shared ladder. The starfield is the **endgame**: stars are dim on the ground and grow brighter each zone, blazing in full only when you reach THE COSMOS — the final level of achievement. Reaching a new zone fires a celebration.
+Your net worth is a journey across biomes, each paired with a skin so a single milestone unlocks the skin, its zone, and its theme music together: **🏙️ NEON CITY (Classic) → 🌱 GREEN MEADOW (Game Boy) → 💎 CRYSTAL CAVE (SNES) → 🏜️ GOLDEN DUNES (Arcade) → 🏔️ FROZEN PEAK (Mushroom) → 🌲 WHISPER WOODS (Jungle)**, with a live progress bar to the next zone in the header. The endgame is **🌌 THE COSMOS** — earned not by balance but by completing *every* deed (the same condition as the secret MIDAS skin). The starfield is the reward: stars are dim in the city and grow brighter each zone, blazing in full only once you ascend to THE COSMOS. Reaching a new zone fires a celebration.
 
 ### 🌧️ Budget-driven weather
 The sky reacts to your Budget Boss. Stay healthy and it's **clear**; as you approach the limit it **clouds over**, then **rains** in the danger zone, and breaks into a **lightning storm** once you blow the budget — wordless, ambient feedback on how the month is going (respects reduced-motion).

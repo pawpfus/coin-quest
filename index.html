@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=80" />
+  <link rel="stylesheet" href="styles.css?v=81" />
 </head>
 
 <body>
@@ -60,9 +60,9 @@
         <span class="xp-next" id="xpNext">0 / 1000 XP</span>
       </div>
       <div class="zone-row" id="zoneRow">
-        <span class="zone-tag" id="zoneTag">🌱 GREEN MEADOW</span>
+        <span class="zone-tag" id="zoneTag">🏙️ NEON CITY</span>
         <span class="zone-track"><span class="zone-fill" id="zoneFill"></span></span>
-        <span class="zone-next" id="zoneNext">NEXT: WHISPER WOODS</span>
+        <span class="zone-next" id="zoneNext">NEXT: GREEN MEADOW</span>
       </div>
     </header>
 
@@ -297,7 +297,12 @@
           <div class="bounty-grid" id="bountyList"></div>
           <div class="bounty-reward" id="bountyReward">CLEAR ALL 3 FOR A REWARD</div>
         </div>
-        <div class="quest-grid" id="questList"></div>
+        <button type="button" class="deeds-toggle" id="deedsToggle">
+          <span class="dt-title">📜 DEEDS</span>
+          <span class="dt-count" id="deedsCount">0 / 16</span>
+          <span class="qb-arrow" id="deedsArrow">▼</span>
+        </button>
+        <div class="quest-grid" id="questList" hidden></div>
       </div>
     </section>
 
@@ -386,7 +391,7 @@
   <!-- toast for level-up / coin pickups -->
   <div class="toast" id="toast" aria-live="polite"></div>
 
-  <script src="app.js?v=80"></script>
+  <script src="app.js?v=81"></script>
 </body>
 
 </html>

@@ -104,6 +104,7 @@ const els = {
   // side quests
   questList: $('questList'),
   questToggle: $('questToggle'), questScroll: $('questScroll'), questProgress: $('questProgress'),
+  deedsToggle: $('deedsToggle'), deedsCount: $('deedsCount'),
   // chest + themes
   chestBtn: $('chestBtn'), chestStreak: $('chestStreak'), chestSay: $('chestSay'),
   themeGrid: $('themeGrid'),
@@ -828,6 +829,15 @@ function renderQuests() {
   // guild banner progress
   const doneCount = CHALLENGES.filter((c) => { const { cur, goal } = c.check(); return cur >= goal; }).length;
   els.questProgress.textContent = doneCount + ' / ' + CHALLENGES.length + ' DEEDS COMPLETED';
+  els.deedsCount.textContent = doneCount + ' / ' + CHALLENGES.length;
+}
+
+/* show/hide the deeds list inside the quest board */
+function toggleDeeds() {
+  const opening = els.questList.hidden;
+  els.questList.hidden = !opening;
+  els.deedsToggle.classList.toggle('open', opening);
+  if (opening) beep([523, 659], 0.06, 'triangle', 0.04); else sfx.click();
 }
 
 /* quest board open/close with a little guild-horn flourish */
@@ -988,37 +998,49 @@ function renderThemes() {
    WORLD ZONES — your net worth is a journey across biomes,
    and reaching THE COSMOS (the full starfield) is the endgame.
 ============================================================ */
-// Zone tiers mirror the skin unlock thresholds, so reaching a milestone
-// unlocks a skin, its zone, and its music together (see THEMES + TRACKS).
+// Each zone is paired with a skin, so reaching a milestone unlocks a skin,
+// its zone, and its music together (see THEMES + TRACKS). The balance-gated
+// zones run City -> ... -> Whisper Woods; THE COSMOS is the endgame, earned
+// by completing every deed (the same condition as the secret MIDAS skin).
 const ZONES = [
-  { id: 'meadow', name: 'GREEN MEADOW',  icon: '🌱', min: 0,         skin: 'default' },
-  { id: 'forest', name: 'WHISPER WOODS', icon: '🌲', min: 50000000,  skin: 'gameboy' },
+  { id: 'city',   name: 'NEON CITY',     icon: '🏙️', min: 0,         skin: 'default' },
+  { id: 'meadow', name: 'GREEN MEADOW',  icon: '🌱', min: 50000000,  skin: 'gameboy' },
   { id: 'cave',   name: 'CRYSTAL CAVE',  icon: '💎', min: 75000000,  skin: 'snes' },
   { id: 'desert', name: 'GOLDEN DUNES',  icon: '🏜️', min: 100000000, skin: 'arcade' },
   { id: 'peak',   name: 'FROZEN PEAK',   icon: '🏔️', min: 125000000, skin: 'mario' },
-  { id: 'cosmos', name: 'THE COSMOS',    icon: '🌌', min: 150000000, skin: 'jungle' },
+  { id: 'forest', name: 'WHISPER WOODS', icon: '🌲', min: 150000000, skin: 'jungle' },
+  { id: 'cosmos', name: 'THE COSMOS',    icon: '🌌', allDeeds: true,  skin: 'midas' },
 ];
-// how brightly the starfield burns in each zone — dim on the ground, blazing in space
-const ZONE_STAR = { meadow: 0.12, forest: 0.22, cave: 0.38, desert: 0.55, peak: 0.8, cosmos: 1.5 };
-function zoneIndexFor(balance) {
+// how brightly the starfield burns in each zone — dim in the city, blazing in space
+const ZONE_STAR = { city: 0.12, meadow: 0.22, cave: 0.38, desert: 0.52, peak: 0.68, forest: 0.85, cosmos: 1.5 };
+const allDeedsDone = () => state.questsDone.length >= CHALLENGES.length;
+function currentZoneIndex() {
+  // completing every deed unlocks MIDAS and ascends you to THE COSMOS
+  if (allDeedsDone()) return ZONES.findIndex((z) => z.id === 'cosmos');
+  const bal = totals().balance;
   let idx = 0;
-  ZONES.forEach((z, i) => { if (balance >= z.min) idx = i; });
+  ZONES.forEach((z, i) => { if (z.min != null && bal >= z.min) idx = i; });
   return idx;
 }
 function renderZone() {
-  const bal = totals().balance;
-  const idx = zoneIndexFor(bal);
+  const idx = currentZoneIndex();
   const z = ZONES[idx];
   document.documentElement.dataset.zone = z.id;
   els.zoneTag.textContent = z.icon + ' ' + z.name;
   const next = ZONES[idx + 1];
-  if (next) {
+  if (z.id === 'cosmos') {
+    els.zoneFill.style.width = '100%';
+    els.zoneNext.textContent = '★ MAX ZONE ★';
+  } else if (next && next.allDeeds) {
+    // the final stretch is gated by completing every deed, not by balance
+    const done = state.questsDone.length, total = CHALLENGES.length;
+    els.zoneFill.style.width = clamp(Math.round((done / total) * 100), 0, 100) + '%';
+    els.zoneNext.textContent = 'NEXT: ' + next.name + ' (' + done + '/' + total + ' DEEDS)';
+  } else if (next) {
+    const bal = totals().balance;
     const pct = clamp(Math.round(((bal - z.min) / (next.min - z.min)) * 100), 0, 100);
     els.zoneFill.style.width = pct + '%';
     els.zoneNext.textContent = 'NEXT: ' + next.name;
-  } else {
-    els.zoneFill.style.width = '100%';
-    els.zoneNext.textContent = '★ MAX ZONE ★';
   }
   // celebrate the first time the player reaches a new zone (never on load or at the start)
   if (!state.zoneSeen.includes(z.id)) {
@@ -1720,6 +1742,7 @@ els.recapClose.addEventListener('click', closeRecap);
 els.recapOverlay.addEventListener('click', (e) => { if (e.target === els.recapOverlay) closeRecap(); });
 els.oracleStage.addEventListener('click', oracleTap);
 els.questToggle.addEventListener('click', toggleQuestBoard);
+els.deedsToggle.addEventListener('click', toggleDeeds);
 els.vaultToggle.addEventListener('click', toggleVault);
 els.optToggle.addEventListener('click', () => {
   const opening = els.optScroll.hidden;
