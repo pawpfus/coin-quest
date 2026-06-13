@@ -988,13 +988,15 @@ function renderThemes() {
    WORLD ZONES — your net worth is a journey across biomes,
    and reaching THE COSMOS (the full starfield) is the endgame.
 ============================================================ */
+// Zone tiers mirror the skin unlock thresholds, so reaching a milestone
+// unlocks a skin, its zone, and its music together (see THEMES + TRACKS).
 const ZONES = [
-  { id: 'meadow', name: 'GREEN MEADOW',  icon: '🌱', min: 0 },
-  { id: 'forest', name: 'WHISPER WOODS', icon: '🌲', min: 5000000 },
-  { id: 'cave',   name: 'CRYSTAL CAVE',  icon: '💎', min: 25000000 },
-  { id: 'desert', name: 'GOLDEN DUNES',  icon: '🏜️', min: 75000000 },
-  { id: 'peak',   name: 'FROZEN PEAK',   icon: '🏔️', min: 150000000 },
-  { id: 'cosmos', name: 'THE COSMOS',    icon: '🌌', min: 300000000 },
+  { id: 'meadow', name: 'GREEN MEADOW',  icon: '🌱', min: 0,         skin: 'default' },
+  { id: 'forest', name: 'WHISPER WOODS', icon: '🌲', min: 50000000,  skin: 'gameboy' },
+  { id: 'cave',   name: 'CRYSTAL CAVE',  icon: '💎', min: 75000000,  skin: 'snes' },
+  { id: 'desert', name: 'GOLDEN DUNES',  icon: '🏜️', min: 100000000, skin: 'arcade' },
+  { id: 'peak',   name: 'FROZEN PEAK',   icon: '🏔️', min: 125000000, skin: 'mario' },
+  { id: 'cosmos', name: 'THE COSMOS',    icon: '🌌', min: 150000000, skin: 'jungle' },
 ];
 // how brightly the starfield burns in each zone — dim on the ground, blazing in space
 const ZONE_STAR = { meadow: 0.12, forest: 0.22, cave: 0.38, desert: 0.55, peak: 0.8, cosmos: 1.5 };
@@ -2099,11 +2101,22 @@ function stopMusic() {
   if (music.timer) { clearInterval(music.timer); music.timer = null; }
 }
 function setMusicLabel() { els.music.textContent = state.musicOn ? ('♫ ' + curTrack().name) : '♫ MUSIC: OFF'; }
+// a track is locked until its related skin is unlocked (CLASSIC/default is always free)
+function trackUnlocked(tk) {
+  if (!tk || !tk.skin || tk.skin === 'default') return true;
+  const th = THEMES.find((t) => t.id === tk.skin);
+  return th ? themeUnlocked(th) : true;
+}
 function cycleMusic() {
-  if (!state.musicOn) { state.musicOn = true; state.musicTrack = 0; }
-  else {
-    state.musicTrack += 1;
-    if (state.musicTrack >= TRACKS.length) { state.musicOn = false; state.musicTrack = 0; }
+  if (!state.musicOn) {
+    state.musicOn = true;
+    state.musicTrack = 0; // CLASSIC (default skin) is always available
+  } else {
+    // advance to the next UNLOCKED track; wrap round to OFF past the last one
+    let i = state.musicTrack;
+    do { i += 1; } while (i < TRACKS.length && !trackUnlocked(TRACKS[i]));
+    if (i >= TRACKS.length) { state.musicOn = false; state.musicTrack = 0; }
+    else state.musicTrack = i;
   }
   save();
   setMusicLabel();
@@ -2111,6 +2124,8 @@ function cycleMusic() {
   if (state.musicOn) { music.step = 0; startMusic(); }
 }
 els.music.addEventListener('click', cycleMusic);
+// if a saved track points at a now-locked skin (e.g. after a restore), fall back to CLASSIC
+if (!trackUnlocked(curTrack())) state.musicTrack = 0;
 setMusicLabel();
 
 // stop the music loop when the app is hidden/backgrounded; resume if it was on
