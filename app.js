@@ -924,6 +924,8 @@ const THEMES = [
   { id: 'gameboy', name: 'GAME BOY', req: () => totals().balance >= 50000000,  reqLabel: 'BAL $50M',  sw: ['#0f380f', '#9bbc0f'] },
   { id: 'snes',    name: 'SNES',     req: () => totals().balance >= 75000000,  reqLabel: 'BAL $75M',  sw: ['#211a3a', '#b6a6ff'] },
   { id: 'arcade',  name: 'ARCADE',   req: () => totals().balance >= 100000000, reqLabel: 'BAL $100M', sw: ['#05050a', '#ff2fd0'] },
+  { id: 'mario',   name: 'MUSHROOM', req: () => totals().balance >= 125000000, reqLabel: 'BAL $125M', sw: ['#5c94fc', '#e52521'] },
+  { id: 'jungle',  name: 'JUNGLE',   req: () => totals().balance >= 150000000, reqLabel: 'BAL $150M', sw: ['#0c2a1a', '#ff5a36'] },
   { id: 'midas',   name: 'MIDAS',    req: () => state.questsDone.length >= CHALLENGES.length, reqLabel: 'ALL QUESTS', sw: ['#120d02', '#ffd23f'] },
 ];
 function themeUnlocked(t) {

@@ -2443,6 +2443,46 @@ body[data-theme="arcade"] {
   --shadow: #000006;
 }
 
+/* Super Mario Bros — sky blue, brick, and coin gold */
+body[data-theme="mario"] {
+  --bg: #5c94fc;
+  --bg-2: #4377d6;
+  --panel: #c75000;
+  --panel-lt: #e06818;
+  --ink: #fff8e8;
+  --ink-dim: #ffdca8;
+  --gold: #fbd000;
+  --gold-dk: #c89400;
+  --green: #43b047;
+  --green-dk: #2a7d2e;
+  --red: #e52521;
+  --red-dk: #a81818;
+  --blue: #4fa9ff;
+  --purple: #b06bff;
+  --pink: #ff8ec4;
+  --shadow: #5a2600;
+}
+
+/* Crash Bandicoot jungle — canopy green, tropical teal, Wumpa orange */
+body[data-theme="jungle"] {
+  --bg: #0c2a1a;
+  --bg-2: #123d26;
+  --panel: #1a5236;
+  --panel-lt: #277a4e;
+  --ink: #f3ffe9;
+  --ink-dim: #9ccf8f;
+  --gold: #ffb627;
+  --gold-dk: #c8801a;
+  --green: #6cd957;
+  --green-dk: #2f8a37;
+  --red: #ff5a36;
+  --red-dk: #c03515;
+  --blue: #2fd0c0;
+  --purple: #b06bff;
+  --pink: #ff8a5c;
+  --shadow: #04150c;
+}
+
 body[data-theme="midas"] {
   --bg: #120d02;
   --bg-2: #1e1606;
