@@ -1802,71 +1802,50 @@ if ('serviceWorker' in navigator) {
 ============================================================ */
 const N2F = (n) => 440 * Math.pow(2, (n - 69) / 12); // MIDI note -> frequency
 // jukebox: cycle OFF -> CALM -> COZY TOWN -> OFF with the MUSIC button
+// One original chiptune theme PER unlockable skin, in the same order as THEMES.
+// Each `skin` id ties a track to its palette so picking a skin auto-plays its song.
 const TRACKS = [
-  { // calm/hopeful: warm major pads (C–G–Am–F), gentle rising lead
-    name: 'CALM', stepMs: 300, drone: true,
-    pad:  [48, 0, 0, 0, 43, 0, 0, 0, 45, 0, 0, 0, 41, 0, 0, 0],
-    lead: [0, 0, 72, 76, 0, 79, 76, 0, 0, 0, 81, 79, 0, 76, 74, 72], leadType: 'triangle', leadDur: 0.55,
-    twinkle: [84, 88, 91, 96],
-  },
-  { // cozy town: bouncier mid-tempo C–Am–F–G with a friendly skipping melody
-    name: 'COZY TOWN', stepMs: 220, drone: false,
-    pad:  [48, 0, 0, 0, 45, 0, 0, 0, 41, 0, 0, 0, 43, 0, 0, 0],
-    lead: [76, 0, 72, 0, 74, 0, 69, 0, 72, 0, 77, 0, 74, 0, 79, 0], leadType: 'triangle', leadDur: 0.5,
-    twinkle: [84, 88, 91],
-  },
-  { // overworld: upbeat oom-pah bass + bright bouncy square melody
-    name: 'OVERWORLD', stepMs: 175, drone: false,
+  { // CLASSIC (default skin): heroic NES overworld march — C–G–Am–F oom-pah + bright square hero line
+    name: 'CLASSIC', stepMs: 170, drone: false, skin: 'default',
     bass: [48, 55, 48, 55, 43, 50, 43, 50, 45, 52, 45, 52, 41, 48, 41, 48], bassType: 'triangle', bassDur: 0.14, bassVol: 0.05,
-    lead: [72, 0, 76, 79, 81, 79, 76, 72, 74, 0, 77, 81, 79, 77, 74, 72], leadType: 'square', leadDur: 0.16, leadVol: 0.038,
-    twinkle: [88, 91, 96],
-  },
-  { // battle: fast driving A-minor pulse with an urgent square riff
-    name: 'BATTLE', stepMs: 145, drone: false,
-    bass: [45, 45, 45, 45, 41, 41, 41, 41, 48, 48, 48, 48, 43, 43, 43, 43], bassType: 'square', bassDur: 0.1, bassVol: 0.05,
-    lead: [69, 72, 76, 69, 72, 76, 81, 76, 77, 74, 72, 69, 71, 72, 74, 76], leadType: 'square', leadDur: 0.12, leadVol: 0.04,
-  },
-  { // victory: triumphant ascending fanfare over big chords
-    name: 'VICTORY', stepMs: 200, drone: false,
-    pad:  [48, 0, 0, 0, 41, 0, 0, 0, 43, 0, 0, 0, 48, 0, 0, 0], padDur: 1.1,
-    lead: [72, 76, 79, 84, 79, 84, 88, 0, 77, 81, 84, 89, 84, 0, 84, 0], leadType: 'square', leadDur: 0.22, leadVol: 0.05,
-    twinkle: [91, 96],
-  },
-  { // space: slow airy open-fifth pads (Am–F–C–G) with a sparse drifting lead
-    name: 'SPACE', stepMs: 300, drone: false,
-    pad:  [45, 0, 0, 0, 41, 0, 0, 0, 48, 0, 0, 0, 43, 0, 0, 0], padChord: [0, 7], padDur: 1.6,
-    lead: [0, 0, 76, 79, 0, 81, 79, 76, 0, 0, 72, 74, 0, 76, 74, 72], leadType: 'triangle', leadDur: 0.55, leadVol: 0.036,
-    twinkle: [81, 84, 88, 91],
-  },
-  { // eerie: detuned low drone, dissonant tritone+min3rd pads, Phrygian lead, min-2nd shimmer
-    name: 'EERIE', stepMs: 360, drone: true, droneNote: 33, droneDur: 3.0, droneDetune: true,
-    pad:  [45, 0, 0, 0, 0, 0, 0, 0, 51, 0, 0, 0, 0, 0, 0, 0], padChord: [0, 6, 3], padDur: 2.4,
-    lead: [0, 0, 77, 0, 76, 0, 0, 72, 0, 0, 70, 0, 69, 0, 0, 0], leadType: 'triangle', leadDur: 0.7, leadVol: 0.034,
-    twinkle: [81, 83, 86, 89], twinkleCluster: true,
-  },
-  { // classic: Ode to Joy (Beethoven, public domain) as a stately 8-bit court piece
-    name: 'CLASSIC', stepMs: 250, drone: false,
-    bass: [48, 0, 43, 0, 48, 0, 43, 0, 48, 0, 43, 0, 48, 43, 48, 0], bassType: 'triangle', bassDur: 0.24, bassVol: 0.042,
-    lead: [64, 64, 65, 67, 67, 65, 64, 62, 60, 60, 62, 64, 64, 62, 62, 0], leadType: 'square', leadDur: 0.23, leadVol: 0.04,
+    lead: [72, 0, 72, 74, 76, 0, 79, 0, 77, 0, 76, 74, 72, 0, 67, 0], leadType: 'square', leadDur: 0.15, leadVol: 0.04,
     twinkle: [84, 88, 91],
   },
-  { // winter: Vivaldi "L'inverno" (Four Seasons, public domain) — the driving F-minor storm of mvt I
-    name: 'WINTER', stepMs: 140, drone: false,
-    bass: [41, 41, 41, 41, 41, 41, 41, 41, 36, 36, 36, 36, 36, 36, 36, 36], bassType: 'square', bassDur: 0.1, bassVol: 0.05,
-    lead: [0, 65, 65, 65, 65, 67, 68, 70, 72, 70, 68, 67, 65, 63, 65, 0], leadType: 'square', leadDur: 0.12, leadVol: 0.04,
-    twinkle: [89, 91, 96], twinkleCluster: true,
+  { // GAME BOY skin: lo-fi monochrome handheld — thin pulse bass + bouncy A-minor-pentatonic blips, no pads
+    name: 'GAME BOY', stepMs: 140, drone: false, skin: 'gameboy',
+    bass: [45, 45, 52, 45, 41, 41, 48, 41, 43, 43, 50, 43, 40, 40, 47, 40], bassType: 'square', bassDur: 0.09, bassVol: 0.045,
+    lead: [69, 72, 76, 72, 74, 72, 69, 0, 67, 69, 72, 69, 76, 74, 72, 0], leadType: 'square', leadDur: 0.1, leadVol: 0.038,
+    twinkle: [81, 84],
   },
-  { // mushroom: original bouncy plumber-platformer romp (C–Am–F–G oom-pah) — pairs with the Mushroom skin
+  { // SNES skin: lush 16-bit dream — sustained sine pads (F–Dm–Bb–C) under a flowing triangle melody
+    name: 'SNES', stepMs: 230, drone: false, skin: 'snes',
+    pad: [41, 0, 0, 0, 38, 0, 0, 0, 46, 0, 0, 0, 48, 0, 0, 0], padDur: 1.8,
+    lead: [0, 0, 77, 81, 84, 0, 81, 77, 0, 0, 74, 77, 81, 0, 77, 74], leadType: 'triangle', leadDur: 0.5, leadVol: 0.038,
+    twinkle: [89, 93, 96],
+  },
+  { // ARCADE skin: neon coin-op attract mode — fast descending-chromatic square pulse + flashy high riff
+    name: 'ARCADE', stepMs: 130, drone: false, skin: 'arcade',
+    bass: [45, 45, 45, 45, 44, 44, 44, 44, 43, 43, 43, 43, 42, 42, 42, 42], bassType: 'square', bassDur: 0.09, bassVol: 0.05,
+    lead: [81, 0, 84, 81, 88, 0, 84, 81, 80, 0, 83, 80, 87, 0, 83, 80], leadType: 'square', leadDur: 0.1, leadVol: 0.04,
+    twinkle: [93, 96], twinkleCluster: true,
+  },
+  { // MUSHROOM (mario skin): original bouncy plumber-platformer romp — C–Am–F–G oom-pah
     name: 'MUSHROOM', stepMs: 150, drone: false, skin: 'mario',
     bass: [48, 55, 48, 55, 45, 52, 45, 52, 41, 48, 41, 48, 43, 50, 43, 50], bassType: 'triangle', bassDur: 0.13, bassVol: 0.05,
     lead: [72, 76, 79, 0, 76, 72, 69, 0, 77, 81, 84, 0, 79, 74, 67, 0], leadType: 'square', leadDur: 0.12, leadVol: 0.04,
     twinkle: [88, 91, 96],
   },
-  { // jungle: original tribal D-minor-pentatonic groove with syncopated low toms — pairs with the Jungle skin
+  { // JUNGLE skin: original tribal D-minor-pentatonic groove with syncopated low toms
     name: 'JUNGLE', stepMs: 165, drone: false, skin: 'jungle',
     bass: [38, 38, 0, 38, 0, 38, 36, 0, 33, 33, 0, 33, 0, 41, 0, 41], bassType: 'triangle', bassDur: 0.12, bassVol: 0.055,
     lead: [62, 0, 65, 67, 0, 69, 67, 65, 62, 0, 60, 62, 0, 65, 67, 0], leadType: 'square', leadDur: 0.14, leadVol: 0.04,
     twinkle: [74, 77, 81], twinkleCluster: true,
+  },
+  { // MIDAS skin: regal golden fanfare — major-triad pads (C–F–G–C) under a shimmering ascending hero line
+    name: 'MIDAS', stepMs: 195, drone: false, skin: 'midas',
+    pad: [48, 0, 0, 0, 41, 0, 0, 0, 43, 0, 0, 0, 48, 0, 0, 0], padChord: [0, 4, 7], padDur: 1.3,
+    lead: [72, 76, 79, 84, 0, 83, 79, 76, 77, 81, 84, 89, 0, 84, 79, 84], leadType: 'square', leadDur: 0.2, leadVol: 0.045,
+    twinkle: [91, 96, 98],
   },
 ];
 const music = { timer: null, step: 0 };

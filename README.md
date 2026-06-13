@@ -81,7 +81,7 @@ Enter the Konami code (↑↑↓↓←→←→ B A) on a keyboard, or tap the t
 Pac-Man and the four ghosts (drawn as crisp SVG sprites) drift and bounce freely around the screen for extra retro charm — and **scatter in surprise whenever you log a transaction**, then settle back down. They never block clicks, and they respect your "reduced motion" setting.
 
 ### 🎶 Chiptune jukebox
-Looping 8-bit tracks generated live with the Web Audio API (no audio files). The MUSIC button cycles OFF → Calm → Cozy Town → Overworld → Battle → Victory → Space → Eerie → Classic (Ode to Joy) → Winter (Vivaldi) → Mushroom → Jungle. The Mushroom and Jungle tracks are original chiptune tunes in a platformer / tribal-jungle style, and selecting the matching skin auto-plays its theme while music is on.
+Looping 8-bit tracks generated live with the Web Audio API (no audio files) — **one original theme per skin**. The MUSIC button cycles OFF → Classic → Game Boy → SNES → Arcade → Mushroom → Jungle → Midas, mirroring the skin list. Every track is an original chiptune tune written to match its skin's mood (heroic NES march, lo-fi handheld, lush 16-bit pads, neon arcade pulse, platformer romp, tribal-jungle groove, regal golden fanfare), and selecting any skin auto-plays its theme while music is on.
 
 ### ✨ Parallax starfield + day/night
 Slow-drifting pixel stars twinkle behind the panels, and the sky shifts with your real local time — warm dawn, bright day, dusk, and a deep starry night with a moon (respects reduced-motion).
