@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=68" />
+  <link rel="stylesheet" href="styles.css?v=69" />
 </head>
 
 <body>
@@ -54,6 +54,26 @@
         <span class="xp-next" id="xpNext">0 / 1000 XP</span>
       </div>
     </header>
+
+    <!-- ===== THE ORACLE — tips from your data ===== -->
+    <section class="panel oracle-panel">
+      <div class="log-head">
+        <h2 class="panel-title">THE ORACLE</h2>
+      </div>
+      <div class="oracle-stage" id="oracleStage" title="Tap to continue">
+        <div class="oracle-orb">
+          <span class="orb-ball">🔮</span>
+          <span class="orb-spark s1">✦</span>
+          <span class="orb-spark s2">✧</span>
+          <span class="orb-spark s3">✦</span>
+        </div>
+        <div class="oracle-bubble">
+          <p class="oracle-text" id="oracleText">Consulting the money spirits…</p>
+          <span class="oracle-more" id="oracleMore" hidden>▼</span>
+        </div>
+      </div>
+      <p class="oracle-note">★ EDUCATIONAL ONLY — NOT FINANCIAL ADVICE · TAP TO CONTINUE</p>
+    </section>
 
     <!-- ===== STAT HUD ===== -->
     <section class="stats" aria-label="Money stats">
@@ -263,33 +283,24 @@
     </section>
 
 
-    <!-- ===== THE ORACLE — tips from your data ===== -->
-    <section class="panel oracle-panel">
-      <div class="log-head">
-        <h2 class="panel-title">THE ORACLE</h2>
-      </div>
-      <div class="oracle-stage" id="oracleStage" title="Tap to continue">
-        <div class="oracle-orb">
-          <span class="orb-ball">🔮</span>
-          <span class="orb-spark s1">✦</span>
-          <span class="orb-spark s2">✧</span>
-          <span class="orb-spark s3">✦</span>
-        </div>
-        <div class="oracle-bubble">
-          <p class="oracle-text" id="oracleText">Consulting the money spirits…</p>
-          <span class="oracle-more" id="oracleMore" hidden>▼</span>
-        </div>
-      </div>
-      <p class="oracle-note">★ EDUCATIONAL ONLY — NOT FINANCIAL ADVICE · TAP TO CONTINUE</p>
-    </section>
-
-    <!-- ===== THEME / SKINS + AUDIO ===== -->
+    <!-- ===== THE VAULT — skins + audio, behind a sealed door ===== -->
     <section class="panel theme-panel">
-      <h2 class="panel-title">🎨 SKINS</h2>
-      <div class="theme-grid" id="themeGrid"></div>
-      <div class="audio-toggles">
-        <button type="button" class="mute-btn" id="muteBtn" title="Toggle sound">♪ SOUND: ON</button>
-        <button type="button" class="mute-btn" id="musicBtn" title="Toggle music">♫ MUSIC: OFF</button>
+      <button type="button" class="vault-banner" id="vaultToggle">
+        <span class="vault-dial" id="vaultDial">🔒</span>
+        <span class="qb-text">
+          <span class="vault-title">▚ THE VAULT ▞</span>
+          <span class="vault-sub" id="vaultSub">SEALED — TAP TO UNLOCK</span>
+        </span>
+        <span class="qb-arrow" id="vaultArrow">▼</span>
+      </button>
+      <div class="vault-scroll" id="vaultScroll" hidden>
+        <div class="vault-section">🎨 SKINS</div>
+        <div class="theme-grid" id="themeGrid"></div>
+        <div class="vault-section">🔊 AUDIO</div>
+        <div class="audio-toggles">
+          <button type="button" class="mute-btn" id="muteBtn" title="Toggle sound">♪ SOUND: ON</button>
+          <button type="button" class="mute-btn" id="musicBtn" title="Toggle music">♫ MUSIC: OFF</button>
+        </div>
       </div>
     </section>
 
@@ -339,7 +350,7 @@
   <!-- toast for level-up / coin pickups -->
   <div class="toast" id="toast" aria-live="polite"></div>
 
-  <script src="app.js?v=68"></script>
+  <script src="app.js?v=69"></script>
 </body>
 
 </html>

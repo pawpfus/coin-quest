@@ -103,6 +103,7 @@ const els = {
   // chest + themes
   chestBtn: $('chestBtn'), chestStreak: $('chestStreak'), chestSay: $('chestSay'),
   themeGrid: $('themeGrid'),
+  vaultToggle: $('vaultToggle'), vaultScroll: $('vaultScroll'), vaultDial: $('vaultDial'), vaultSub: $('vaultSub'),
   // monthly recap
   recapBtn: $('recapBtn'), recapOverlay: $('recapOverlay'), recapClose: $('recapClose'),
   recapMonth: $('recapMonth'), recapGrade: $('recapGrade'), recapRows: $('recapRows'),
@@ -827,6 +828,17 @@ function toggleQuestBoard() {
   else sfx.click();
 }
 
+/* the vault: heavy door over the skins + audio settings */
+function toggleVault() {
+  const opening = els.vaultScroll.hidden;
+  els.vaultScroll.hidden = !opening;
+  els.vaultToggle.classList.toggle('open', opening);
+  els.vaultDial.textContent = opening ? '🔓' : '🔒';
+  els.vaultSub.textContent = opening ? 'UNSEALED — YOUR TREASURES' : 'SEALED — TAP TO UNLOCK';
+  if (opening) beep([98, 131, 196], 0.07, 'square', 0.05); // tumbler clunk
+  else sfx.click();
+}
+
 let oracleIdx = 0;
 let typeTimer = null;
 let typingFull = '';                 // full text of the tip currently being typed (for tap-to-skip)
@@ -1498,6 +1510,7 @@ els.recapClose.addEventListener('click', closeRecap);
 els.recapOverlay.addEventListener('click', (e) => { if (e.target === els.recapOverlay) closeRecap(); });
 els.oracleStage.addEventListener('click', oracleTap);
 els.questToggle.addEventListener('click', toggleQuestBoard);
+els.vaultToggle.addEventListener('click', toggleVault);
 els.chestBtn.addEventListener('click', openChest);
 
 // Konami code (keyboard) → rainbow cheat

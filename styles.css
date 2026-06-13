@@ -276,25 +276,6 @@ h1 {
   letter-spacing: 1px;
 }
 
-.corner-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 2;
-  font-family: inherit;
-  font-size: 7px;
-  cursor: pointer;
-  padding: 6px 8px;
-  color: var(--ink-dim);
-  background: var(--bg-2);
-  border: 2px solid var(--shadow);
-}
-
-.corner-btn:hover {
-  color: var(--gold);
-  border-color: var(--gold);
-}
-
 .stat-value {
   font-size: clamp(15px, 4vw, 24px);
   white-space: nowrap;
@@ -2231,10 +2212,38 @@ select {
   line-height: 1.5;
 }
 
-/* =========================== THEME PICKER =========================== */
+/* =========================== THE VAULT (skins + audio) =========================== */
 .theme-panel {
   margin-bottom: 18px;
+  padding: 12px;
 }
+
+/* steel vault door banner */
+.vault-banner {
+  font-family: inherit; cursor: pointer; width: 100%;
+  display: flex; align-items: center; gap: 12px; text-align: left;
+  padding: 12px 14px; color: var(--ink);
+  background: linear-gradient(180deg, #3a4254 0%, #262d3d 55%, #181d2a 100%);
+  border: 3px solid var(--shadow);
+  box-shadow: inset 0 2px 0 rgba(160, 190, 230, .25), inset 0 -3px 0 rgba(0, 0, 0, .5);
+}
+.vault-banner:hover { filter: brightness(1.12); }
+.vault-dial {
+  font-size: 22px; flex: 0 0 auto;
+  filter: drop-shadow(2px 2px 0 var(--shadow));
+}
+.vault-banner.open .vault-dial { animation: dialSpin .45s ease; }
+@keyframes dialSpin { from { transform: rotate(-150deg); } to { transform: rotate(0); } }
+.vault-title { display: block; font-size: 10px; color: #b8c8e0; letter-spacing: 2px; text-shadow: 2px 2px 0 var(--shadow); }
+.vault-sub { display: block; font-size: 7px; color: #7e8ca6; margin-top: 6px; letter-spacing: 1px; }
+.vault-banner .qb-arrow { color: #b8c8e0; }
+.vault-banner.open .qb-arrow { transform: rotate(180deg); }
+
+/* vault interior unrolls like the quest scroll */
+.vault-scroll { transform-origin: top; animation: unroll .4s cubic-bezier(.18, .89, .32, 1.18); margin-top: 10px; }
+.vault-scroll[hidden] { display: none; }
+.vault-section { font-size: 8px; color: var(--ink-dim); letter-spacing: 1px; margin: 14px 0 8px; }
+.vault-scroll .vault-section:first-child { margin-top: 4px; }
 
 .theme-grid {
   display: grid;
