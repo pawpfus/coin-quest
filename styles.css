@@ -49,9 +49,11 @@ a, button, input, select, textarea, label, [role="button"], [tabindex] {
 /* background lives on <html> so the fixed starfield canvas (z-index:-1)
    can show through the transparent <body> */
 html {
+  min-height: 100%;
   background:
-    radial-gradient(circle at 50% 0%, var(--panel) 0%, var(--bg) 60%),
+    radial-gradient(150% 100% at 50% -25%, var(--panel) 0%, var(--bg) 70%),
     var(--bg);
+  background-attachment: fixed;
   transition: background-color .3s;
 }
 
@@ -60,22 +62,25 @@ html {
 html[data-daynight="dawn"] {
   background:
     linear-gradient(180deg, rgba(255, 158, 107, .20) 0%, rgba(255, 158, 107, 0) 45%),
-    radial-gradient(circle at 50% 0%, var(--panel) 0%, var(--bg) 60%),
+    radial-gradient(150% 100% at 50% -25%, var(--panel) 0%, var(--bg) 70%),
     var(--bg);
+  background-attachment: fixed;
 }
 
 html[data-daynight="day"] {
   background:
     linear-gradient(180deg, rgba(91, 139, 224, .22) 0%, rgba(91, 139, 224, 0) 50%),
-    radial-gradient(circle at 50% 0%, var(--panel) 0%, var(--bg) 60%),
+    radial-gradient(150% 100% at 50% -25%, var(--panel) 0%, var(--bg) 70%),
     var(--bg);
+  background-attachment: fixed;
 }
 
 html[data-daynight="dusk"] {
   background:
     linear-gradient(180deg, rgba(255, 111, 145, .20) 0%, rgba(255, 111, 145, 0) 45%),
-    radial-gradient(circle at 50% 0%, var(--panel) 0%, var(--bg) 60%),
+    radial-gradient(150% 100% at 50% -25%, var(--panel) 0%, var(--bg) 70%),
     var(--bg);
+  background-attachment: fixed;
 }
 
 /* night uses the default background */
@@ -112,7 +117,7 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
+  background: radial-gradient(ellipse 80% 80% at center, transparent 72%, rgba(0, 0, 0, 0.28) 100%);
 }
 
 /* parallax starfield, painted behind all content */

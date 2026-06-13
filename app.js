@@ -1811,6 +1811,12 @@ const TRACKS = [
     lead: [64, 64, 65, 67, 67, 65, 64, 62, 60, 60, 62, 64, 64, 62, 62, 0], leadType: 'square', leadDur: 0.23, leadVol: 0.04,
     twinkle: [84, 88, 91],
   },
+  { // winter: Vivaldi "L'inverno" (Four Seasons, public domain) — the driving F-minor storm of mvt I
+    name: 'WINTER', stepMs: 140, drone: false,
+    bass: [41, 41, 41, 41, 41, 41, 41, 41, 36, 36, 36, 36, 36, 36, 36, 36], bassType: 'square', bassDur: 0.1, bassVol: 0.05,
+    lead: [0, 65, 65, 65, 65, 67, 68, 70, 72, 70, 68, 67, 65, 63, 65, 0], leadType: 'square', leadDur: 0.12, leadVol: 0.04,
+    twinkle: [89, 91, 96], twinkleCluster: true,
+  },
 ];
 const music = { timer: null, step: 0 };
 function curTrack() { return TRACKS[state.musicTrack] || TRACKS[0]; }
