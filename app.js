@@ -112,8 +112,7 @@ const els = {
   // monthly recap
   recapBtn: $('recapBtn'), recapOverlay: $('recapOverlay'), recapClose: $('recapClose'),
   recapMonth: $('recapMonth'), recapGrade: $('recapGrade'), recapRows: $('recapRows'),
-  // world zones + weekly bounties + combo meter
-  zoneTag: $('zoneTag'), zoneFill: $('zoneFill'),
+  // weekly bounties + combo meter
   bountyList: $('bountyList'), bountyReset: $('bountyReset'), bountyReward: $('bountyReward'),
   comboPop: $('comboPop'),
 };
@@ -1013,27 +1012,12 @@ const ZONES = [
 ];
 // how brightly the starfield burns in each zone — dim in the city, blazing in space
 const ZONE_STAR = { city: 0.12, meadow: 0.22, cave: 0.38, peak: 0.52, desert: 0.68, forest: 0.85, cosmos: 1.5 };
-const allDeedsDone = () => state.questsDone.length >= CHALLENGES.length;
 function renderZone() {
   // your ACTIVE SKIN decides which realm you stand in — skin, zone, and music
-  // all switch together when you pick a skin in the Vault.
+  // all switch together when you pick a skin in the Vault. Drives the
+  // biome background + starfield brightness via data-zone (no header UI).
   const z = ZONES.find((zz) => zz.skin === state.theme) || ZONES[0];
   document.documentElement.dataset.zone = z.id;
-  els.zoneTag.textContent = z.icon + ' ' + z.name;
-  // silent progress bar: how close your net worth is to unlocking the next realm
-  const bal = totals().balance;
-  let cur = 0;
-  ZONES.forEach((zz, i) => { if (zz.min != null && bal >= zz.min) cur = i; });
-  const next = ZONES[cur + 1];
-  if (allDeedsDone()) {
-    els.zoneFill.style.width = '100%';
-  } else if (next && next.allDeeds) {
-    els.zoneFill.style.width = clamp(Math.round((state.questsDone.length / CHALLENGES.length) * 100), 0, 100) + '%';
-  } else if (next) {
-    els.zoneFill.style.width = clamp(Math.round(((bal - ZONES[cur].min) / (next.min - ZONES[cur].min)) * 100), 0, 100) + '%';
-  } else {
-    els.zoneFill.style.width = '100%';
-  }
 }
 
 /* ============================================================
