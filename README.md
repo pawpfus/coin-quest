@@ -1,4 +1,4 @@
-# 🪙 COIN QUEST — 8-Bit Personal Finance Tracker
+# 🪙 OCTROVEBOX — 8-Bit Personal Finance Tracker
 
 > Track your money like it's a retro NES adventure. Earn gold, fight the Budget Boss, complete savings quests, and keep your spending streak alive.
 
@@ -78,7 +78,7 @@ Three rotating challenges on the Quest Board that **reset every Monday**, comput
 Logging several entries in quick succession builds a **combo multiplier** — a pulsing "COMBO ×N" badge with escalating chiptune blips that bursts into an "on fire" state at ×5+, rewarding focused logging sessions. The chain breaks after a short idle gap (session-only, never saved).
 
 ### 🎨 Unlockable skins
-Retro theme palettes that re-skin the whole app — Classic, Game Boy, SNES, Arcade, **Mushroom** (sky-blue & brick) and **Jungle** (canopy green & Wumpa orange) unlock as your balance grows, and a secret **Midas** gold skin unlocks only after you complete every Side Quest.
+Retro theme palettes that re-skin the whole app — Classic, Game Boy, SNES, Arcade, **Fantasy** (sky-blue & brick) and **Undersea** (abyssal navy & bioluminescent teal) unlock as your balance grows, and a secret **Midas** gold skin unlocks only after you complete every Side Quest.
 
 ### 🌈 Secret cheat
 Enter the Konami code (↑↑↓↓←→←→ B A) on a keyboard, or tap the title 8 times on mobile, to toggle rainbow mode with a coin rain.
@@ -87,10 +87,10 @@ Enter the Konami code (↑↑↓↓←→←→ B A) on a keyboard, or tap the t
 Pac-Man and the four ghosts (drawn as crisp SVG sprites) drift and bounce freely around the screen for extra retro charm — and **scatter in surprise whenever you log a transaction**, then settle back down. They never block clicks, and they respect your "reduced motion" setting.
 
 ### 🎶 Chiptune jukebox
-Looping 8-bit tracks generated live with the Web Audio API (no audio files) — **one original theme per skin, locked behind that skin**. The MUSIC button cycles OFF → Classic → Game Boy → SNES → Arcade → Mushroom → Jungle → Midas, **skipping any track whose skin you haven't unlocked yet** (Classic is always free). Every track is an original chiptune tune written to match its skin's mood (heroic NES march, lo-fi handheld, lush 16-bit pads, neon arcade pulse, platformer romp, tribal-jungle groove, regal golden fanfare), and selecting any unlocked skin auto-plays its theme while music is on.
+Looping 8-bit tracks generated live with the Web Audio API (no audio files) — **one original theme per skin, locked behind that skin**. The MUSIC button cycles OFF → Classic → Game Boy → SNES → Arcade → Fantasy → Undersea → Midas, **skipping any track whose skin you haven't unlocked yet** (Classic is always free). Every track is an original chiptune tune written to match its skin's mood (heroic NES march, lo-fi handheld, lush 16-bit pads, neon arcade pulse, storybook-platformer romp, deep-water mystery, regal golden fanfare), and selecting any unlocked skin auto-plays its theme while music is on.
 
 ### 🗺️ World zones
-Every skin is paired with a biome, and **your active skin decides which realm you stand in** — picking a skin in the Vault switches the palette, the world behind the app, and the theme music all at once: **🏙️ NEON CITY (Classic) · 🌱 GREEN MEADOW (Game Boy) · 💎 CRYSTAL CAVE (SNES) · 🏔️ FROZEN PEAK (Arcade) · 🏜️ GOLDEN DUNES (Mushroom) · 🌲 WHISPER WOODS (Jungle) · 🌌 THE COSMOS (Midas)**. Skins unlock as your balance grows (Midas only after completing *every* deed). The starfield is the reward: stars are dim in the city and grow brighter in each later realm, blazing in full only once you don the Midas skin and ascend to THE COSMOS.
+Every skin is paired with a biome, and **your active skin decides which realm you stand in** — picking a skin in the Vault switches the palette, the world behind the app, and the theme music all at once: **🏙️ NEON CITY (Classic) · 🌱 GREEN MEADOW (Game Boy) · 💎 CRYSTAL CAVE (SNES) · 🏔️ FROZEN PEAK (Arcade) · 🏜️ GOLDEN DUNES (Fantasy) · 🐙 KRAKEN DEEP (Undersea) · 🌌 THE COSMOS (Midas)**. Each biome carries its own pixel scenery (trees, mushrooms, crystals, snow peaks, a bubbling kraken, a ringed planet). Skins unlock as your balance grows (Midas only after completing *every* deed). The starfield is the reward: stars are dim in the city and grow brighter in each later realm, blazing in full only once you don the Midas skin and ascend to THE COSMOS.
 
 ### 🌧️ Budget-driven weather
 The sky reacts to your Budget Boss. Stay healthy and it's **clear**; as you approach the limit it **clouds over**, then **rains** in the danger zone, and breaks into a **lightning storm** once you blow the budget — wordless, ambient feedback on how the month is going (respects reduced-motion).
@@ -132,7 +132,7 @@ pwsh ./build.ps1      # outputs dist/coin-quest.html
 
 ## 📱 Install as an app (PWA)
 
-Coin Quest is a **Progressive Web App** — install it for a home-screen icon, a fullscreen view with no browser chrome, and full **offline** support (a service worker caches the app shell). No app store required.
+Octrovebox is a **Progressive Web App** — install it for a home-screen icon, a fullscreen view with no browser chrome, and full **offline** support (a service worker caches the app shell). No app store required.
 
 **Android (Chrome):** open the site → menu (⋮) → **Install app** / **Add to Home screen**.
 
@@ -190,4 +190,4 @@ All data stays on your device in `localStorage`. Nothing is ever sent anywhere. 
 
 ---
 
-*© 200X COIN QUEST · INSERT COIN*
+*© 200X OCTROVEBOX · INSERT COIN*

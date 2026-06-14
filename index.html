@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>COIN QUEST — 8-Bit Finance Tracker</title>
+  <title>OCTROVEBOX — 8-Bit Finance Tracker</title>
 
   <!-- PWA: installable app -->
   <link rel="manifest" href="manifest.webmanifest?v=72" />
@@ -14,13 +14,13 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Coin Quest" />
+  <meta name="apple-mobile-web-app-title" content="Octrovebox" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png?v=72" />
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=72" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=84" />
+  <link rel="stylesheet" href="styles.css?v=85" />
 </head>
 
 <body>
@@ -39,6 +39,9 @@
   <!-- budget-driven weather particles (foreground) -->
   <canvas class="weather" id="weather" aria-hidden="true"></canvas>
 
+  <!-- rising bubbles (only shown in the UNDERSEA / Kraken Deep zone) -->
+  <div class="bubbles" id="bubbles" aria-hidden="true"></div>
+
   <!-- scanline + crt overlay -->
   <div class="crt"></div>
 
@@ -47,7 +50,7 @@
     <header class="hud-top">
       <div class="title-block">
         <img class="logo-octo" id="logoOcto" src="icon-192.png?v=72" alt="" aria-hidden="true" />
-        <h1>COIN&nbsp;QUEST</h1>
+        <h1>OCTROVEBOX</h1>
         <p class="subtitle">- PERSONAL FINANCE ADVENTURE -</p>
       </div>
       <div class="player-row">
@@ -346,7 +349,7 @@
     </section>
 
     <footer class="foot">
-      <span class="copyright">© 200X COIN QUEST · INSERT COIN</span>
+      <span class="copyright">© 200X OCTROVEBOX · INSERT COIN</span>
     </footer>
   </div>
 
@@ -376,7 +379,7 @@
       <div class="recap-month" id="recapMonth">MONTH</div>
       <div class="recap-grade" id="recapGrade">A</div>
       <div class="recap-rows" id="recapRows"></div>
-      <div class="recap-foot">SCREENSHOT TO SHARE · COIN QUEST</div>
+      <div class="recap-foot">SCREENSHOT TO SHARE · OCTROVEBOX</div>
     </div>
   </div>
 
@@ -386,7 +389,7 @@
   <!-- toast for level-up / coin pickups -->
   <div class="toast" id="toast" aria-live="polite"></div>
 
-  <script src="app.js?v=84"></script>
+  <script src="app.js?v=85"></script>
 </body>
 
 </html>

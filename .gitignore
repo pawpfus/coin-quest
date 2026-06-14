@@ -5,6 +5,7 @@
 dist/
 
 # exported backups (user data — never commit)
+octrovebox-backup-*.json
 coin-quest-backup-*.json
 
 # OS cruft

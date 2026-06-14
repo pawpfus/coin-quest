@@ -1,6 +1,6 @@
 {
-  "name": "Coin Quest — 8-Bit Finance Tracker",
-  "short_name": "Coin Quest",
+  "name": "Octrovebox — 8-Bit Finance Tracker",
+  "short_name": "Octrovebox",
   "description": "Track your money like a retro NES adventure. Earn gold, fight the Budget Boss, and complete savings quests.",
   "start_url": "./",
   "scope": "./",

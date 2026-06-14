@@ -1,8 +1,8 @@
-/* COIN QUEST service worker — network-first with offline fallback.
+/* OCTROVEBOX service worker — network-first with offline fallback.
    Network-first means the latest deployed version always wins when online,
    while the cached app shell keeps it working offline.
    Bump CACHE when you change any shell asset. */
-const CACHE = 'coinquest-v84';
+const CACHE = 'octrovebox-v85';
 const ASSETS = [
   './',
   './index.html',

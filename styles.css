@@ -1,5 +1,5 @@
 /* ============================================================
-   COIN QUEST — 8-bit finance tracker
+   OCTROVEBOX — 8-bit finance tracker
    Palette inspired by the NES: deep navy void, candy accents,
    chunky beveled "sprite" panels, hard pixel shadows.
 ============================================================ */
@@ -2437,24 +2437,24 @@ body[data-theme="mario"] {
   --shadow: #5a2600;
 }
 
-/* Crash Bandicoot jungle — canopy green, tropical teal, Wumpa orange */
-body[data-theme="jungle"] {
-  --bg: #0c2a1a;
-  --bg-2: #123d26;
-  --panel: #1a5236;
-  --panel-lt: #277a4e;
-  --ink: #f3ffe9;
-  --ink-dim: #9ccf8f;
-  --gold: #ffb627;
-  --gold-dk: #c8801a;
-  --green: #6cd957;
-  --green-dk: #2f8a37;
-  --red: #ff5a36;
-  --red-dk: #c03515;
+/* Undersea — deep abyssal navy, bioluminescent teal, coral accents */
+body[data-theme="undersea"] {
+  --bg: #04222e;
+  --bg-2: #073445;
+  --panel: #0c4a5e;
+  --panel-lt: #126a82;
+  --ink: #d6f7ff;
+  --ink-dim: #6fa9bd;
+  --gold: #ffd23f;
+  --gold-dk: #c8901a;
+  --green: #2fae6a;
+  --green-dk: #1c7a48;
+  --red: #ff6b6b;
+  --red-dk: #c03b3b;
   --blue: #2fd0c0;
   --purple: #b06bff;
-  --pink: #ff8a5c;
-  --shadow: #04150c;
+  --pink: #ff6bc4;
+  --shadow: #02141c;
 }
 
 body[data-theme="midas"] {
@@ -2599,21 +2599,22 @@ html[data-zone="city"] .zone-layer {
 /* GREEN MEADOW — bushes + little flowers dotting the grass */
 html[data-zone="meadow"] .zone-layer {
   background:
-    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 76 40' shape-rendering='crispEdges'><rect x='4' y='26' width='24' height='14' fill='%231f7a2e'/><rect x='8' y='20' width='16' height='8' fill='%23259138'/><rect x='12' y='16' width='8' height='5' fill='%23259138'/><rect x='30' y='34' width='2' height='6' fill='%23259138'/><rect x='33' y='31' width='2' height='9' fill='%23259138'/><rect x='41' y='26' width='2' height='12' fill='%23227a2e'/><rect x='38' y='20' width='8' height='6' fill='%23ff6bc4'/><rect x='41' y='22' width='2' height='2' fill='%23ffd23f'/><rect x='57' y='28' width='2' height='10' fill='%23227a2e'/><rect x='54' y='22' width='8' height='6' fill='%234fa9ff'/><rect x='57' y='24' width='2' height='2' fill='%23ffd23f'/></svg>") bottom / auto 70px repeat-x,
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 76 40' shape-rendering='crispEdges'><rect x='4' y='26' width='24' height='14' fill='%231f7a2e'/><rect x='8' y='20' width='16' height='8' fill='%23259138'/><rect x='12' y='16' width='8' height='5' fill='%23259138'/><rect x='30' y='34' width='2' height='6' fill='%23259138'/><rect x='33' y='31' width='2' height='9' fill='%23259138'/><rect x='41' y='26' width='2' height='12' fill='%23227a2e'/><rect x='38' y='20' width='8' height='6' fill='%23ff6bc4'/><rect x='41' y='22' width='2' height='2' fill='%23ffd23f'/><rect x='57' y='28' width='2' height='10' fill='%23227a2e'/><rect x='54' y='22' width='8' height='6' fill='%234fa9ff'/><rect x='57' y='24' width='2' height='2' fill='%23ffd23f'/></svg>") center 86% / auto 70px repeat-x,
     linear-gradient(180deg, rgba(75,227,90,.06), rgba(75,227,90,0) 38%),
     linear-gradient(0deg, #14531f 0 13%, #1f7a2e 13% 17%, transparent 17%);
 }
-/* WHISPER WOODS — a row of pixel trees */
-html[data-zone="forest"] .zone-layer {
+/* KRAKEN DEEP — a looming kraken over a coral sea floor */
+html[data-zone="undersea"] .zone-layer {
   background:
-    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 56' shape-rendering='crispEdges'><rect x='19' y='44' width='5' height='12' fill='%234a2f12'/><rect x='14' y='36' width='15' height='9' fill='%232f8a3e'/><rect x='16' y='28' width='11' height='9' fill='%232f8a3e'/><rect x='18' y='21' width='7' height='8' fill='%232f8a3e'/><rect x='20' y='16' width='3' height='6' fill='%232f8a3e'/><rect x='14' y='42' width='15' height='3' fill='%23246e30'/><rect x='58' y='46' width='5' height='10' fill='%234a2f12'/><rect x='50' y='32' width='21' height='14' fill='%233a9a4a'/><rect x='46' y='36' width='29' height='8' fill='%233a9a4a'/><rect x='54' y='26' width='13' height='8' fill='%233a9a4a'/></svg>") bottom / auto 98px repeat-x,
-    linear-gradient(180deg, rgba(40,120,70,.09), rgba(40,120,70,0) 38%),
-    linear-gradient(0deg, #0a3318 0 16%, #114a26 16% 21%, transparent 21%);
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 90 86'><path d='M20 50 C10 60 18 70 8 80' stroke='%230f5a73' stroke-width='6' fill='none' stroke-linecap='round'/><path d='M34 56 C30 68 40 74 32 84' stroke='%230f5a73' stroke-width='7' fill='none' stroke-linecap='round'/><path d='M56 56 C60 68 50 74 58 84' stroke='%230f5a73' stroke-width='7' fill='none' stroke-linecap='round'/><path d='M70 50 C80 60 72 70 82 80' stroke='%230f5a73' stroke-width='6' fill='none' stroke-linecap='round'/><path d='M45 60 C45 72 45 76 45 86' stroke='%230f5a73' stroke-width='8' fill='none' stroke-linecap='round'/><ellipse cx='45' cy='34' rx='26' ry='24' fill='%2314708a'/><ellipse cx='45' cy='26' rx='20' ry='12' fill='%231d86a3'/><rect x='28' y='27' width='13' height='4' fill='%230c4a5e' transform='rotate(18 34 29)'/><rect x='49' y='27' width='13' height='4' fill='%230c4a5e' transform='rotate(-18 56 29)'/><circle cx='36' cy='34' r='5' fill='%23ffe06a'/><circle cx='36' cy='34' r='2' fill='%2310202a'/><circle cx='54' cy='34' r='5' fill='%23ffe06a'/><circle cx='54' cy='34' r='2' fill='%2310202a'/></svg>") center 66% / auto 190px no-repeat,
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 48'><path d='M12 48 C8 38 16 34 12 24' stroke='%232fae6a' stroke-width='4' fill='none'/><path d='M19 48 C23 40 16 34 21 26' stroke='%2337c878' stroke-width='3' fill='none'/><rect x='34' y='34' width='16' height='4' fill='%23ff6bc4'/><rect x='40' y='34' width='4' height='14' fill='%23ff6bc4'/><rect x='34' y='38' width='4' height='10' fill='%23ff6bc4'/><rect x='46' y='36' width='4' height='12' fill='%23ff8ad4'/><rect x='58' y='40' width='4' height='8' fill='%23ff9f1c'/><rect x='62' y='36' width='4' height='12' fill='%23ffb347'/></svg>") center 86% / auto 80px repeat-x,
+    linear-gradient(180deg, rgba(47,160,200,.12), rgba(47,160,200,0) 55%),
+    linear-gradient(0deg, #073445 0 15%, #0c5168 15% 20%, transparent 20%);
 }
 /* CRYSTAL CAVE — glowing crystal spires */
 html[data-zone="cave"] .zone-layer {
   background:
-    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 68 48' shape-rendering='crispEdges'><rect x='11' y='16' width='4' height='5' fill='%23b06bff'/><rect x='9' y='21' width='8' height='7' fill='%23b06bff'/><rect x='7' y='28' width='12' height='20' fill='%23b06bff'/><rect x='12' y='21' width='2' height='25' fill='%23d6b3ff'/><rect x='40' y='28' width='3' height='4' fill='%232fd0c0'/><rect x='38' y='32' width='7' height='5' fill='%232fd0c0'/><rect x='36' y='37' width='11' height='11' fill='%232fd0c0'/><rect x='54' y='33' width='3' height='4' fill='%23ff6bc4'/><rect x='52' y='37' width='7' height='11' fill='%23ff6bc4'/></svg>") bottom / auto 86px repeat-x,
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 68 48' shape-rendering='crispEdges'><rect x='11' y='16' width='4' height='5' fill='%23b06bff'/><rect x='9' y='21' width='8' height='7' fill='%23b06bff'/><rect x='7' y='28' width='12' height='20' fill='%23b06bff'/><rect x='12' y='21' width='2' height='25' fill='%23d6b3ff'/><rect x='40' y='28' width='3' height='4' fill='%232fd0c0'/><rect x='38' y='32' width='7' height='5' fill='%232fd0c0'/><rect x='36' y='37' width='11' height='11' fill='%232fd0c0'/><rect x='54' y='33' width='3' height='4' fill='%23ff6bc4'/><rect x='52' y='37' width='7' height='11' fill='%23ff6bc4'/></svg>") center 85% / auto 86px repeat-x,
     radial-gradient(120% 60% at 50% 100%, rgba(80,200,210,.10), transparent 60%),
     linear-gradient(180deg, rgba(120,90,200,.07), rgba(120,90,200,0) 40%),
     linear-gradient(0deg, #1c1638 0 15%, #322657 15% 20%, transparent 20%);
@@ -2621,14 +2622,14 @@ html[data-zone="cave"] .zone-layer {
 /* GOLDEN DUNES — cheerful colored mushrooms */
 html[data-zone="desert"] .zone-layer {
   background:
-    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 76 44' shape-rendering='crispEdges'><rect x='14' y='28' width='8' height='14' fill='%23ffe8c0'/><rect x='8' y='18' width='20' height='10' fill='%23e52521'/><rect x='11' y='14' width='14' height='5' fill='%23e52521'/><rect x='12' y='19' width='4' height='4' fill='%23ffffff'/><rect x='20' y='20' width='3' height='3' fill='%23ffffff'/><rect x='16' y='15' width='3' height='3' fill='%23ffffff'/><rect x='45' y='30' width='6' height='12' fill='%23ffe8c0'/><rect x='40' y='22' width='16' height='8' fill='%234fa9ff'/><rect x='42' y='19' width='12' height='4' fill='%234fa9ff'/><rect x='44' y='23' width='3' height='3' fill='%23ffffff'/><rect x='50' y='24' width='2' height='2' fill='%23ffffff'/><rect x='64' y='36' width='2' height='6' fill='%236cd957'/><rect x='61' y='38' width='8' height='4' fill='%236cd957'/></svg>") bottom / auto 84px repeat-x,
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 76 44' shape-rendering='crispEdges'><rect x='14' y='28' width='8' height='14' fill='%23ffe8c0'/><rect x='8' y='18' width='20' height='10' fill='%23e52521'/><rect x='11' y='14' width='14' height='5' fill='%23e52521'/><rect x='12' y='19' width='4' height='4' fill='%23ffffff'/><rect x='20' y='20' width='3' height='3' fill='%23ffffff'/><rect x='16' y='15' width='3' height='3' fill='%23ffffff'/><rect x='45' y='30' width='6' height='12' fill='%23ffe8c0'/><rect x='40' y='22' width='16' height='8' fill='%234fa9ff'/><rect x='42' y='19' width='12' height='4' fill='%234fa9ff'/><rect x='44' y='23' width='3' height='3' fill='%23ffffff'/><rect x='50' y='24' width='2' height='2' fill='%23ffffff'/><rect x='64' y='36' width='2' height='6' fill='%236cd957'/><rect x='61' y='38' width='8' height='4' fill='%236cd957'/></svg>") center 85% / auto 84px repeat-x,
     linear-gradient(180deg, rgba(255,200,100,.08), rgba(255,200,100,0) 40%),
     linear-gradient(0deg, #6e521a 0 14%, #a87f2a 14% 19%, transparent 19%);
 }
 /* FROZEN PEAK — snow-capped mountains */
 html[data-zone="peak"] .zone-layer {
   background:
-    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 104 64' shape-rendering='crispEdges'><rect x='30' y='14' width='8' height='6' fill='%235a6a85'/><rect x='26' y='20' width='16' height='6' fill='%235a6a85'/><rect x='22' y='26' width='24' height='6' fill='%235a6a85'/><rect x='16' y='32' width='36' height='6' fill='%235a6a85'/><rect x='10' y='38' width='48' height='26' fill='%235a6a85'/><rect x='30' y='14' width='8' height='6' fill='%23ffffff'/><rect x='27' y='20' width='6' height='4' fill='%23ffffff'/><rect x='35' y='20' width='5' height='4' fill='%23ffffff'/><rect x='24' y='26' width='5' height='3' fill='%23ffffff'/><rect x='74' y='26' width='6' height='6' fill='%23495873'/><rect x='70' y='32' width='14' height='6' fill='%23495873'/><rect x='64' y='38' width='26' height='26' fill='%23495873'/><rect x='74' y='26' width='6' height='6' fill='%23ffffff'/><rect x='71' y='32' width='5' height='3' fill='%23ffffff'/></svg>") bottom / auto 122px repeat-x,
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 104 64' shape-rendering='crispEdges'><rect x='30' y='14' width='8' height='6' fill='%235a6a85'/><rect x='26' y='20' width='16' height='6' fill='%235a6a85'/><rect x='22' y='26' width='24' height='6' fill='%235a6a85'/><rect x='16' y='32' width='36' height='6' fill='%235a6a85'/><rect x='10' y='38' width='48' height='26' fill='%235a6a85'/><rect x='30' y='14' width='8' height='6' fill='%23ffffff'/><rect x='27' y='20' width='6' height='4' fill='%23ffffff'/><rect x='35' y='20' width='5' height='4' fill='%23ffffff'/><rect x='24' y='26' width='5' height='3' fill='%23ffffff'/><rect x='74' y='26' width='6' height='6' fill='%23495873'/><rect x='70' y='32' width='14' height='6' fill='%23495873'/><rect x='64' y='38' width='26' height='26' fill='%23495873'/><rect x='74' y='26' width='6' height='6' fill='%23ffffff'/><rect x='71' y='32' width='5' height='3' fill='%23ffffff'/></svg>") center 83% / auto 122px repeat-x,
     linear-gradient(180deg, rgba(180,210,255,.12), rgba(180,210,255,0) 42%),
     linear-gradient(0deg, #a9c7df 0 13%, #dfeefb 13% 18%, transparent 18%);
 }
@@ -2639,6 +2640,28 @@ html[data-zone="cosmos"] .zone-layer {
     radial-gradient(130% 90% at 50% 100%, rgba(124,77,200,.14), transparent 62%),
     radial-gradient(90% 60% at 18% 12%, rgba(79,169,255,.08), transparent 55%);
 }
+
+/* rising bubbles — only in the UNDERSEA zone */
+.bubbles {
+  position: fixed;
+  inset: 0;
+  z-index: 2;            /* in front of content, behind weather/floaters/CRT */
+  pointer-events: none;
+  display: none;
+  opacity: .55;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,.55) 2px, transparent 3px),
+    radial-gradient(circle, rgba(180,230,255,.45) 1px, transparent 2px),
+    radial-gradient(circle, rgba(214,247,255,.4) 3px, transparent 4px);
+  background-size: 120px 200px, 80px 160px, 200px 260px;
+  background-position: 0 0, 40px 80px, 90px 30px;
+}
+html[data-zone="undersea"] .bubbles { display: block; animation: bubbleRise 14s linear infinite; }
+@keyframes bubbleRise {
+  from { background-position: 0 0, 40px 80px, 90px 30px; }
+  to   { background-position: 0 -200px, 40px -80px, 90px -230px; }
+}
+@media (prefers-reduced-motion: reduce) { .bubbles { display: none !important; } }
 
 /* ============================================================
    BUDGET WEATHER — foreground particle canvas
