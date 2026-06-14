@@ -128,10 +128,9 @@ const els = {
   pinSetBtn: $('pinSetBtn'), pinOffBtn: $('pinOffBtn'),
   // currency
   currencySelect: $('currencySelect'),
-  // recurring (auto-pilot)
+  // recurring (auto-pilot) — lives inside the New Entry panel
   repeatInput: $('repeatInput'),
-  recurToggle: $('recurToggle'), recurScroll: $('recurScroll'), recurList: $('recurList'),
-  recurEmpty: $('recurEmpty'), recurSub: $('recurSub'),
+  recurInline: $('recurInline'), recurList: $('recurList'), recurSub: $('recurSub'),
   // onboarding tour
   onboardOverlay: $('onboardOverlay'), obArt: $('obArt'), obTitle: $('obTitle'), obBody: $('obBody'),
   obDots: $('obDots'), obNext: $('obNext'), obBack: $('obBack'), obSkip: $('obSkip'), obSample: $('obSample'),
@@ -1331,8 +1330,10 @@ function runRecurring() {
 function renderRecurring() {
   if (!els.recurList) return;
   const list = state.recurring || [];
-  els.recurEmpty.style.display = list.length ? 'none' : 'block';
-  els.recurSub.textContent = list.length ? list.length + ' ACTIVE RULE' + (list.length > 1 ? 'S' : '') : 'AUTO-LOG SALARY, RENT…';
+  // the whole block only appears once there's at least one rule, keeping the
+  // New Entry panel tidy (the 🔁 REPEAT field above is the entry point)
+  if (els.recurInline) els.recurInline.hidden = list.length === 0;
+  if (els.recurSub) els.recurSub.textContent = list.length ? ' · ' + list.length + ' ACTIVE' : '';
   els.recurList.innerHTML = '';
   list.slice().sort((a, b) => a.nextDue - b.nextDue).forEach((r) => {
     const c = catInfo(r.type, r.category);
@@ -2120,13 +2121,7 @@ if (els.currencySelect) els.currencySelect.addEventListener('change', () => {
   showToast('💱 CURRENCY: ' + state.currency + ' ' + cur().symbol);
 });
 
-// auto-pilot (recurring) panel
-if (els.recurToggle) els.recurToggle.addEventListener('click', () => {
-  const opening = els.recurScroll.hidden;
-  els.recurScroll.hidden = !opening;
-  els.recurToggle.classList.toggle('open', opening);
-  if (opening) beep([330, 440, 587], 0.06, 'square', 0.04); else sfx.click();
-});
+// auto-pilot (recurring) — stop a rule from the inline list in the New Entry panel
 if (els.recurList) els.recurList.addEventListener('click', (e) => {
   const btn = e.target.closest('.rc-del');
   if (btn) removeRecurring(btn.dataset.id);
