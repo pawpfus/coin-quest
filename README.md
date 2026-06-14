@@ -83,8 +83,8 @@ Retro theme palettes that re-skin the whole app — Classic, Game Boy, SNES, Arc
 ### 🌈 Secret cheat
 Enter the Konami code (↑↑↓↓←→←→ B A) on a keyboard, or tap the title 8 times on mobile, to toggle rainbow mode with a coin rain.
 
-### 👾 Roaming buddies
-Pac-Man and the four ghosts (drawn as crisp SVG sprites) drift and bounce freely around the screen for extra retro charm — and **scatter in surprise whenever you log a transaction**, then settle back down. They never block clicks, and they respect your "reduced motion" setting.
+### 🌧️ Themed ambient floats
+Each zone has its own drifting ambience that changes with your active skin: **slow rain** in Neon City, **snow** on the Frozen Peak, **fish** swimming through Kraken Deep, and twinkling **motes** tinted to each other biome (green pollen in the meadow, crystal sparks in the cave, gold fairy-dust in the dunes, stardust in the cosmos). They never block clicks, and they respect your "reduced motion" setting.
 
 ### 🎶 Chiptune jukebox
 Looping 8-bit tracks generated live with the Web Audio API (no audio files) — **one original theme per skin, locked behind that skin**. The MUSIC button cycles OFF → Classic → Game Boy → SNES → Arcade → Fantasy → Undersea → Midas, **skipping any track whose skin you haven't unlocked yet** (Classic is always free). Every track is an original chiptune tune written to match its skin's mood (heroic NES march, lo-fi handheld, lush 16-bit pads, neon arcade pulse, storybook-platformer romp, deep-water mystery, regal golden fanfare), and selecting any unlocked skin auto-plays its theme while music is on.

@@ -59,7 +59,6 @@ let currentFilter = 'all';      // type filter: all / income / expense
 let catFilterVal = 'all';       // quest-log category filter
 let monthFilterVal = 'all';     // quest-log month filter (y*12+m, or 'all')
 let editingId = null; // id of the transaction being edited (null = adding new)
-let scatterBuddies = () => {}; // assigned by the roaming-buddies system below
 
 /* ---------------- elements ---------------- */
 const $ = (id) => document.getElementById(id);
@@ -1338,7 +1337,6 @@ function addTx(e) {
   if (currentType === 'income') flyCoinsTo(els.balanceCard); // coins fly into the balance
   if (currentType === 'expense') hitBoss(amount); // boss takes a hit
   bumpCombo();       // rapid-logging combo multiplier
-  scatterBuddies(); // the pixel buddies bolt away in surprise
   maybeEncounter();  // a chance at a random RPG event
 
   els.form.reset();
@@ -1896,89 +1894,94 @@ if ('serviceWorker' in navigator) {
 }
 
 /* ============================================================
-   ROAMING BUDDIES — little pixel characters that drift around
+   THEMED AMBIENT FLOATS — particles that match the active zone:
+   city rain, frozen-peak snow, undersea fish, and twinkling motes
+   tinted to each other biome. Replaces the old roaming buddies.
 ============================================================ */
-(function spawnFloaters() {
-  // respect users who prefer no motion
-  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+(function ambientFloats() {
+  const cv = document.getElementById('ambient');
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; // honour no-motion
 
-  // Pac-Man cast, drawn as inline SVG so the ghosts get their proper colors
-  const ghost = (c) => `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M12 54 a38 38 0 0 1 76 0 L88 90 L80 81 L68 90 L56 81 L44 90 L32 81 L20 90 L12 81 Z" fill="${c}"/><circle cx="38" cy="50" r="12" fill="#fff"/><circle cx="64" cy="50" r="12" fill="#fff"/><circle cx="34" cy="50" r="6" fill="#1b1b46"/><circle cx="60" cy="50" r="6" fill="#1b1b46"/></svg>`;
-  const PACMAN = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 50 L92 30 A46 46 0 1 0 92 70 Z" fill="#ffd23f"/><circle cx="46" cy="26" r="5.5" fill="#0b0b1f"/></svg>`;
-  const SPRITES = [
-    PACMAN,
-    ghost('#ff5d5d'), // Blinky (red)
-    ghost('#ff6bc4'), // Pinky (pink)
-    ghost('#2fe0e0'), // Inky (cyan)
-    ghost('#ff9f1c'), // Clyde (orange)
-  ];
-  const COUNT = 4;
-  const buddies = [];
-
-  for (let i = 0; i < COUNT; i++) {
-    const el = document.createElement('div');
-    el.className = 'floater';
-    const inner = document.createElement('span');
-    inner.className = 'fl-inner';
-    const size = 24 + Math.random() * 14;
-    inner.innerHTML = SPRITES[Math.floor(Math.random() * SPRITES.length)];
-    const svg = inner.firstChild;
-    svg.setAttribute('width', size);
-    svg.setAttribute('height', size);
-    svg.style.display = 'block';
-    el.appendChild(inner);
-    document.body.appendChild(el);
-
-    inner.style.animationDelay = (Math.random() * 1.5) + 's';
-
-    const ang = Math.random() * Math.PI * 2;
-    const base = 0.3 + Math.random() * 0.4;             // gentle drift speed
-    const b = {
-      el, size,
-      x: Math.random() * Math.max(1, window.innerWidth - size),
-      y: Math.random() * Math.max(1, window.innerHeight - size),
-      vx: Math.cos(ang) * base, vy: Math.sin(ang) * base,
-      base, boostUntil: 0, boostSpeed: base,
-    };
-    buddies.push(b);
-  }
-
-  // burst: fling every buddy in a fresh random direction at high speed
-  scatterBuddies = () => {
-    const now = performance.now();
-    buddies.forEach((b) => {
-      const a = Math.random() * Math.PI * 2;
-      b.boostSpeed = 6 + Math.random() * 4;
-      b.vx = Math.cos(a) * b.boostSpeed;
-      b.vy = Math.sin(a) * b.boostSpeed;
-      b.boostUntil = now + 850;
-    });
+  // zone -> particle mode (+ palette for motes / fish)
+  const MODES = {
+    city:     { kind: 'rain' },
+    peak:     { kind: 'snow' },
+    undersea: { kind: 'fish',  cols: ['#ff9f1c', '#2fd0c0', '#ff6bc4', '#ffd23f'] },
+    meadow:   { kind: 'mote',  cols: ['#6cd957', '#a8e063', '#ffd23f'] },   // pollen / leaves
+    cave:     { kind: 'mote',  cols: ['#b06bff', '#2fd0c0', '#ff6bc4'] },   // crystal sparks
+    desert:   { kind: 'mote',  cols: ['#ffd23f', '#ffe08a', '#ffffff'] },   // fantasy fairy dust
+    cosmos:   { kind: 'mote',  cols: ['#ffd23f', '#ffffff', '#b06bff'] },   // stardust
   };
+  let w, h, mode = null, key = '', parts = [];
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-  (function step(now) {
-    buddies.forEach((b) => {
-      const boosting = now < b.boostUntil;
-      const target = boosting ? b.boostSpeed : b.base;
-      if (!boosting) {            // gentle wander only when calm
-        b.vx += (Math.random() - 0.5) * 0.04;
-        b.vy += (Math.random() - 0.5) * 0.04;
+  function build() {
+    parts = [];
+    if (!mode) return;
+    if (mode.kind === 'rain') {
+      const n = Math.round(w / 16);
+      for (let i = 0; i < n; i++) parts.push({ x: Math.random() * w, y: Math.random() * h, len: rnd(8, 16), sp: rnd(2.5, 5) });
+    } else if (mode.kind === 'snow') {
+      const n = Math.round(w / 22);
+      for (let i = 0; i < n; i++) parts.push({ x: Math.random() * w, y: Math.random() * h, sz: rnd(2, 4) | 0, sp: rnd(0.5, 1.6), ph: Math.random() * 6.28 });
+    } else if (mode.kind === 'fish') {
+      const n = 7;
+      for (let i = 0; i < n; i++) { const dir = Math.random() < 0.5 ? 1 : -1; parts.push({ x: Math.random() * w, y: rnd(h * 0.2, h * 0.9), sp: dir * rnd(0.4, 1.1), sz: rnd(5, 9) | 0, col: pick(mode.cols), ph: Math.random() * 6.28 }); }
+    } else { // mote
+      const n = Math.round(w / 42);
+      for (let i = 0; i < n; i++) { const a = Math.random() * 6.28; const s = rnd(0.15, 0.5); parts.push({ x: Math.random() * w, y: Math.random() * h, vx: Math.cos(a) * s, vy: Math.sin(a) * s, sz: rnd(2, 4) | 0, col: pick(mode.cols), tw: Math.random() * 6.28 }); }
+    }
+  }
+  function resize() {
+    const W = window.innerWidth, H = window.innerHeight;
+    if (!W || !H) { setTimeout(resize, 250); return; }
+    w = cv.width = W; h = cv.height = H; build();
+  }
+  function drawFish(p) {
+    const d = p.sp > 0 ? 1 : -1, x = p.x | 0, y = p.y | 0, s = p.sz;
+    ctx.fillStyle = p.col;
+    ctx.fillRect(x, y, s * 2, s);                                   // body
+    ctx.beginPath();                                               // tail
+    if (d > 0) { ctx.moveTo(x, y + s / 2); ctx.lineTo(x - s, y); ctx.lineTo(x - s, y + s); }
+    else { ctx.moveTo(x + s * 2, y + s / 2); ctx.lineTo(x + s * 2 + s, y); ctx.lineTo(x + s * 2 + s, y + s); }
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#ffffff';                                     // eye
+    ctx.fillRect(d > 0 ? x + s * 1.4 : x + s * 0.4, y + 1, 2, 2);
+  }
+  function paint() {
+    if (cv.width !== window.innerWidth || cv.height !== window.innerHeight) resize();
+    const z = document.documentElement.dataset.zone || '';
+    if (z !== key) { key = z; mode = MODES[z] || null; build(); }
+    ctx.clearRect(0, 0, w, h);
+    if (!mode) return;
+    if (mode.kind === 'rain') {
+      ctx.strokeStyle = 'rgba(150,180,255,.32)'; ctx.lineWidth = 2; ctx.beginPath();
+      for (const p of parts) { p.y += p.sp; p.x += p.sp * 0.18; if (p.y > h) { p.y = -p.len; p.x = Math.random() * w; } ctx.moveTo(p.x, p.y); ctx.lineTo(p.x - p.sp * 0.36, p.y - p.len); }
+      ctx.stroke();
+    } else if (mode.kind === 'snow') {
+      ctx.fillStyle = '#ffffff'; ctx.globalAlpha = 0.85;
+      for (const p of parts) { p.ph += 0.02; p.y += p.sp; p.x += Math.sin(p.ph) * 0.4; if (p.y > h) { p.y = -4; p.x = Math.random() * w; } ctx.fillRect(p.x | 0, p.y | 0, p.sz, p.sz); }
+      ctx.globalAlpha = 1;
+    } else if (mode.kind === 'fish') {
+      for (const p of parts) { p.ph += 0.03; p.x += p.sp; p.y += Math.sin(p.ph) * 0.3; if (p.sp > 0 && p.x > w + 24) p.x = -24; else if (p.sp < 0 && p.x < -24) p.x = w + 24; drawFish(p); }
+    } else { // mote
+      for (const p of parts) {
+        p.tw += 0.04; p.x += p.vx; p.y += p.vy;
+        if (p.x < 0) p.x = w; else if (p.x > w) p.x = 0;
+        if (p.y < 0) p.y = h; else if (p.y > h) p.y = 0;
+        ctx.globalAlpha = 0.35 + 0.6 * Math.abs(Math.sin(p.tw));
+        ctx.fillStyle = p.col; ctx.fillRect(p.x | 0, p.y | 0, p.sz, p.sz);
       }
-      const sp = Math.hypot(b.vx, b.vy) || 0.001;
-      b.vx = (b.vx / sp) * target;
-      b.vy = (b.vy / sp) * target;
-
-      b.x += b.vx; b.y += b.vy;
-      const m = b.size + 6;
-      if (b.x < 0) { b.x = 0; b.vx = Math.abs(b.vx); } else if (b.x > window.innerWidth - m) { b.x = window.innerWidth - m; b.vx = -Math.abs(b.vx); }
-      if (b.y < 0) { b.y = 0; b.vy = Math.abs(b.vy); } else if (b.y > window.innerHeight - m) { b.y = window.innerHeight - m; b.vy = -Math.abs(b.vy); }
-
-      // ease the boost speed back down toward base so they settle smoothly
-      if (!boosting && b.boostSpeed > b.base) b.boostSpeed = b.base;
-
-      b.el.style.transform = 'translate(' + b.x.toFixed(1) + 'px,' + b.y.toFixed(1) + 'px)' + (b.vx < 0 ? ' scaleX(-1)' : '');
-    });
-    requestAnimationFrame(step);
-  })(performance.now());
+      ctx.globalAlpha = 1;
+    }
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  window.addEventListener('orientationchange', () => setTimeout(resize, 300));
+  (function loop() { paint(); requestAnimationFrame(loop); })();
 })();
 
 /* ============================================================
