@@ -2839,12 +2839,26 @@ html[data-zone="undersea"] .bubbles { display: block; animation: bubbleRise 14s 
 }
 .recur-inline[hidden] { display: none; }
 .recur-inline-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: inherit;
   font-size: 8px;
   color: var(--gold);
   letter-spacing: 1px;
   margin-bottom: 12px;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
-.recur-inline-head .recur-sub { color: var(--ink-dim); }
+.recur-inline-head:active { transform: translateY(1px); }
+.recur-head-label .recur-sub { color: var(--ink-dim); }
+.recur-arrow { color: var(--gold); flex-shrink: 0; transition: transform .15s; }
+.recur-inline.collapsed .recur-inline-head { margin-bottom: 0; }
+.recur-inline.collapsed .recur-arrow { transform: rotate(-90deg); }
 /* scrolls like the Deeds list once there are several rules */
 .recur-list {
   max-height: 168px;

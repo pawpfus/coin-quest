@@ -131,6 +131,7 @@ const els = {
   // recurring (auto-pilot) — lives inside the New Entry panel
   repeatInput: $('repeatInput'),
   recurInline: $('recurInline'), recurList: $('recurList'), recurSub: $('recurSub'),
+  recurHead: $('recurHead'), recurArrow: $('recurArrow'),
   // onboarding tour
   onboardOverlay: $('onboardOverlay'), obArt: $('obArt'), obTitle: $('obTitle'), obBody: $('obBody'),
   obDots: $('obDots'), obNext: $('obNext'), obBack: $('obBack'), obSkip: $('obSkip'), obSample: $('obSample'),
@@ -2121,7 +2122,14 @@ if (els.currencySelect) els.currencySelect.addEventListener('change', () => {
   showToast('💱 CURRENCY: ' + state.currency + ' ' + cur().symbol);
 });
 
-// auto-pilot (recurring) — stop a rule from the inline list in the New Entry panel
+// auto-pilot (recurring) — collapse/expand the rules list
+if (els.recurHead) els.recurHead.addEventListener('click', () => {
+  const opening = els.recurList.hidden;
+  els.recurList.hidden = !opening;
+  els.recurInline.classList.toggle('collapsed', !opening);
+  if (opening) beep([330, 440, 587], 0.06, 'square', 0.04); else sfx.click();
+});
+// stop a rule from the inline list in the New Entry panel
 if (els.recurList) els.recurList.addEventListener('click', (e) => {
   const btn = e.target.closest('.rc-del');
   if (btn) removeRecurring(btn.dataset.id);
